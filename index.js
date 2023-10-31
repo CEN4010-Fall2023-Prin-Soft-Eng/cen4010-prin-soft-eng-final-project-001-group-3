@@ -217,6 +217,56 @@ app.post('/review/:gameId', verifyToken, async (req, res) => {
 
 /**
  * @swagger
+ * /review/{gameId}:
+ *   put:
+ *     summary: Allow user to edit their review
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: path
+ *         name: gameId
+ *         required: true
+ *         description: The ID of the game.
+ *       - in: formData
+ *         name: reviewText
+ *         required: true
+ *         description: The text of the review.
+ *     responses:
+ *       201:
+ *         description: Review edited successfully
+ *       403:
+ *         description: Review cannot be empty
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Internal Server Error
+ */
+app.put('/review/:gameId', verifyToken, async (req, res) => {
+});
+
+/**
+ * @swagger
+ * /review/{gameId}:
+ *   delete:
+ *     summary: Allow user to delete their review
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: path
+ *         name: gameId
+ *         required: true
+ *         description: The ID of the game.
+ *     responses:
+ *       201:
+ *         description: Review deleted successfully
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Internal Server Error
+ */
+app.delete('/review/:gameId', verifyToken, async (req, res) => {
+});
+
 /**
  * @swagger
  * /upvote/{gameId}/{reviewId}:
