@@ -377,6 +377,77 @@ app.post('/downvote/:gameId/:reviewId', verifyToken, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /games:
+ *   get:
+ *     summary: List the top 10 latest games
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       200:
+ *         description: Games listed successfully
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/games', async (req, res) => {
+});
+
+/**
+ * @swagger
+ * /games/search:
+ *   get:
+ *     summary: Search for games by criteria
+ *     description: Search for games by title, genre, platform, and/or tag.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: formData
+ *         name: title
+ *         required: false
+ *         description: The title of the game to search for.
+ *       - in: formData
+ *         name: genre
+ *         required: false
+ *         description: The genre of the game to search for.
+ *       - in: formData
+ *         name: platform
+ *         required: false
+ *         description: The platform of the game to search for.
+ *       - in: formData
+ *         name: tag
+ *         required: false
+ *         description: The tag of the game to search for.
+ *     responses:
+ *       200:
+ *         description: 
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/games/search', async (req, res) => {
+});
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   get:
+ *     summary: Get a game by ID
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     description: The ID of the game to retrieve.
+ *     responses:
+ *       200:
+ *         description: Game retrieved successfully
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/game/:id', async (req, res) => {
+});
+
 const port = process.env.PORT || 5678;
 
 console.log(`Server listening at ${port}`);
