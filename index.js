@@ -58,8 +58,7 @@ app.use(express.static('./public'));
  * @swagger
  * /signup:
  *   post:
- *     summary: Create a new user
- *     description: Register a new user with a username and password.
+ *     summary: Register a new user with a username and password
  *     parameters:
  *       - in: formData
  *         name: username
@@ -116,8 +115,7 @@ app.post('/signup', async (req, res) => {
  * @swagger
  * /login:
  *   post:
- *     summary: Login a user
- *     description: Login a user with a username and password.
+ *     summary: Login a user with username and password
  *     parameters:
  *       - in: formData
  *         name: username
@@ -169,17 +167,16 @@ app.post('/login', async (req, res) => {
 
 /**
  * @swagger
- * /addReview:
+ * /review/{gameId}:
  *   post:
  *     summary: Add a review to a game
- *     description: Adds a review to a specific game.
  *     security:
  *       - Bearer: []
  *     parameters:
- *       - in: formData
+ *       - in: path
  *         name: gameId
  *         required: true
- *         description: The ID of the game to review.
+ *         description: The ID of the game.
  *       - in: formData
  *         name: reviewText
  *         required: true
@@ -192,9 +189,10 @@ app.post('/login', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.post('/addReview', verifyToken, async (req, res) => {
+app.post('/review/:gameId', verifyToken, async (req, res) => {
     try {
-        const { gameId, reviewText } = req.body;
+        const { gameId } = req.params;
+        const { reviewText } = req.body;
         const { username } = req.user;
         const game = await Game.find(gameId);
 
@@ -219,17 +217,19 @@ app.post('/addReview', verifyToken, async (req, res) => {
 
 /**
  * @swagger
- * /upvote:
+/**
+ * @swagger
+ * /upvote/{gameId}/{reviewId}:
  *   post:
  *     summary: Upvote a review
  *     security:
  *       - Bearer: []
  *     parameters:
- *       - in: formData
+ *       - in: path
  *         name: gameId
  *         required: true
- *         description: The ID of the game to review.
- *       - in: formData
+ *         description: The ID of the game.
+ *       - in: path
  *         name: reviewId
  *         required: true
  *         description: The ID of the review to upvote.
@@ -241,9 +241,9 @@ app.post('/addReview', verifyToken, async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.post('/upvote', verifyToken, async (req, res) => {
+app.post('/upvote/:gameId/:reviewId', verifyToken, async (req, res) => {
     try {
-        const { gameId, reviewId } = req.body;
+        const { gameId, reviewId } = req.params;
         const { username } = req.user;
         const game = await Game.find(gameId);
 
@@ -274,17 +274,17 @@ app.post('/upvote', verifyToken, async (req, res) => {
 
 /**
  * @swagger
- * /downvote:
+ * /downvote/{gameId}/{reviewId}:
  *   post:
  *     summary: Downvote a review
  *     security:
  *       - Bearer: []
  *     parameters:
- *       - in: formData
+ *       - in: path
  *         name: gameId
  *         required: true
- *         description: The ID of the game to review.
- *       - in: formData
+ *         description: The ID of the game.
+ *       - in: path
  *         name: reviewId
  *         required: true
  *         description: The ID of the review to downvote.
@@ -296,9 +296,9 @@ app.post('/upvote', verifyToken, async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.post('/downvote', verifyToken, async (req, res) => {
+app.post('/downvote/:gameId/:reviewId', verifyToken, async (req, res) => {
     try {
-        const { gameId, reviewId } = req.body;
+        const { gameId, reviewId } = req.params;
         const { username } = req.user;
         const game = await Game.find(gameId);
 
