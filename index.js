@@ -1,9 +1,11 @@
-const express = require('express')
-const app = express()
+const { Game } = require('./game');
+const { User } = require('./user');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
-const { User } = require('./user');
-const jwt = require('jsonwebtoken');
+const express = require('express')
+const jwt = require('jsonwebtoken')
+
+const app = express()
 const secretKey = 'the-secret-key';
 
 const swaggerJSDoc = require('swagger-jsdoc')
@@ -13,7 +15,15 @@ const swaggerOptions = {
         info: {
             title: 'GameReview Server API',
             version: '1.0.0'
-        }
+        },
+        securityDefinitions: {
+            Bearer: {
+                type: 'apiKey',
+                name: 'Authorization',
+                scheme: 'bearer',
+                in: 'header'
+            }
+        },
     },
     apis: ['index.js']
 
@@ -106,7 +116,7 @@ app.post('/signup', async (req, res) => {
  * @swagger
  * /login:
  *   post:
- *     summary: Login a user.
+ *     summary: Login a user
  *     description: Login a user with a username and password.
  *     parameters:
  *       - in: formData
@@ -151,6 +161,166 @@ app.post('/login', async (req, res) => {
         const token = jwt.sign({ username }, secretKey, { expiresIn: '1d' });
 
         res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+/**
+ * @swagger
+ * /addReview:
+ *   post:
+ *     summary: Add a review to a game
+ *     description: Adds a review to a specific game.
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: formData
+ *         name: gameId
+ *         required: true
+ *         description: The ID of the game to review.
+ *       - in: formData
+ *         name: reviewText
+ *         required: true
+ *         description: The text of the review.
+ *     responses:
+ *       201:
+ *         description: Review added successfully
+ *       404:
+ *         description: Game not found
+ *       500:
+ *         description: Internal Server Error
+ */
+app.post('/addReview', verifyToken, async (req, res) => {
+    try {
+        const { gameId, reviewText } = req.body;
+        const { username } = req.user;
+        const game = await Game.find(gameId);
+
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        const errorMessage = game.addReview(username, reviewText);
+
+        if (errorMessage) {
+            return res.status(403).json({ message: errorMessage });
+        }
+
+        await game.save();
+
+        res.status(201).json({ message: 'Review added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+/**
+ * @swagger
+ * /upvote:
+ *   post:
+ *     summary: Upvote a review
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: formData
+ *         name: gameId
+ *         required: true
+ *         description: The ID of the game to review.
+ *       - in: formData
+ *         name: reviewId
+ *         required: true
+ *         description: The ID of the review to upvote.
+ *     responses:
+ *       200:
+ *         description: Upvote successful
+ *       403:
+ *         description: Forbidden (Own review or already voted)
+ *       500:
+ *         description: Internal Server Error
+ */
+app.post('/upvote', verifyToken, async (req, res) => {
+    try {
+        const { gameId, reviewId } = req.body;
+        const { username } = req.user;
+        const game = await Game.find(gameId);
+
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        const review = game.reviews[reviewId];
+
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+
+        const errorMessage = review.upvote(username);
+
+        if (errorMessage) {
+            return res.status(403).json({ message: errorMessage });
+        }
+
+        await game.save();
+
+        res.status(200).json({ message: 'Upvote successful' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+/**
+ * @swagger
+ * /downvote:
+ *   post:
+ *     summary: Downvote a review
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: formData
+ *         name: gameId
+ *         required: true
+ *         description: The ID of the game to review.
+ *       - in: formData
+ *         name: reviewId
+ *         required: true
+ *         description: The ID of the review to downvote.
+ *     responses:
+ *       200:
+ *         description: Downvote successful
+ *       403:
+ *         description: Forbidden (Own review or already voted)
+ *       500:
+ *         description: Internal Server Error
+ */
+app.post('/downvote', verifyToken, async (req, res) => {
+    try {
+        const { gameId, reviewId } = req.body;
+        const { username } = req.user;
+        const game = await Game.find(gameId);
+
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        const review = game.reviews[reviewId];
+
+        if (!review) {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+
+        const errorMessage = review.downvote(username);
+
+        if (errorMessage) {
+            return res.status(403).json({ message: errorMessage });
+        }
+
+        await game.save();
+
+        res.status(200).json({ message: 'Downvote successful' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
