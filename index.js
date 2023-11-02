@@ -167,6 +167,27 @@ app.post('/login', async (req, res) => {
 
 /**
  * @swagger
+ * /user/reviews/{username}:
+ *   get:
+ *     summary: Get all reviews by user
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         description: The username of the user.
+ *     responses:
+ *       200:
+ *         description: Reviews retrieved successfully
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/user/reviews/:username', verifyToken, async (req, res) => {
+});
+
+/**
+ * @swagger
  * /review/{gameId}:
  *   post:
  *     summary: Add a review to a game
