@@ -8,3 +8,5 @@ Angi Demascio - Account / Sign in / Review functionality, Upvotes / Downvotes, S
 James Yackanich,
 
 Esteban Rodriguez - Create basic Results page / Create basic Profile page / Create account functionality / Reviews to profile page / Profile page correctly displays info / Filter on review results
+
+Aeraf Siddiqu - Create Game page / Create Account Page / Create Sign in page / Update Home Page
