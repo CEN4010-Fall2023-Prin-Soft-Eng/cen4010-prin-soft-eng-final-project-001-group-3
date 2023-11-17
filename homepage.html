@@ -63,7 +63,7 @@
                 const offset = (page - 1) * itemsPerPage;
 
                 // Make a GET request to the RAWG API with pagination parameters
-                const response = await fetch(`https://api.rawg.io/api/games?dates=2019-01-01,2019-12-31&ordering=-added&key=48288ff667454f7681cb863cb83b9b82&page_size=${itemsPerPage}&page=${page}&offset=${offset}`);
+                const response = await fetch(`https://api.rawg.io/api/games?dates=2023-01-01,2023-11-01&ordering=-added&key=48288ff667454f7681cb863cb83b9b82&page_size=${itemsPerPage}&page=${page}&offset=${offset}`);
                 
                 // Check if the request was successful (status code 200)
                 if (!response.ok) {
