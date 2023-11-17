@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav>
@@ -41,7 +42,95 @@
             </li>
         </ul>
     </nav>
+    <div id="data-container">
+        <!-- Data based on the desired key will be displayed here -->
+    </div>
 
+    <div id="pagination">
+        <button onclick="prevPage()">Previous Page</button>
+        <span id="currentPage">Page 1</span>
+        <button onclick="nextPage()">Next Page</button>
+    </div>
+
+     <script>
+        let currentPage = 1;
+        const itemsPerPage = 10; // Number of items to display per page
+
+        // Function to fetch and display games data from JSON with pagination
+        async function fetchData(page) {
+            try {
+                // Calculate the offset based on the page number
+                const offset = (page - 1) * itemsPerPage;
+
+                // Make a GET request to the RAWG API with pagination parameters
+                const response = await fetch(`https://api.rawg.io/api/games?dates=2019-01-01,2019-12-31&ordering=-added&key=48288ff667454f7681cb863cb83b9b82&page_size=${itemsPerPage}&page=${page}&offset=${offset}`);
+                
+                // Check if the request was successful (status code 200)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Parse the JSON data from the response
+                const jsonData = await response.json();
+
+                // Log the JSON data to the console to inspect its structure
+                console.log(jsonData);
+
+                // Display games data based on the current page
+                displayGamesData(jsonData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function to display games data from JSON on the HTML page
+        function displayGamesData(data) {
+            // Declare dataContainer outside the if statement
+            const dataContainer = document.getElementById('data-container');
+            const currentPageElement = document.getElementById('currentPage');
+
+            // Check if the "results" key exists in the JSON data
+            if ('results' in data) {
+                // Extract the "results" key and display relevant information
+                const gamesData = data.results;
+
+                if (Array.isArray(gamesData) && gamesData.length > 0) {
+                    // Display each game with a background image
+                    const gamesList = gamesData.map(game => {
+                        const backgroundImage = game.background_image || 'default-image-url.jpg';
+                        return `<div class="game-container" style="background-image: url(${backgroundImage})">
+                                    <p>${game.name}</p>
+                                </div>`;
+                    }).join('');
+
+                    dataContainer.innerHTML = gamesList;
+                    currentPageElement.textContent = `Page ${currentPage}`;
+                } else {
+                    dataContainer.textContent = 'No games data available.';
+                    currentPageElement.textContent = 'Page 1';
+                }
+            } else {
+                dataContainer.textContent = 'No "results" key found in the data.';
+            }
+        }
+
+        // Function to go to the previous page
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchData(currentPage);
+            }
+        }
+
+        // Function to go to the next page
+        function nextPage() {
+            currentPage++;
+            fetchData(currentPage);
+        }
+
+        // Call the fetchData function when the page loads to show the initial page
+        window.onload = () => fetchData(currentPage);
+    </script>
 
     <footer>
         <p>&copy; 2023 GROUP 3 FINAL PROJECT</p>

@@ -1,0 +1,10 @@
+.game-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-size: contain; /* Set the background size to "contain" */
+    background-position: center;
+    color: black;
+    height: 200px; /* Set a fixed height for each game container */
+    background-repeat: no-repeat;
+}
