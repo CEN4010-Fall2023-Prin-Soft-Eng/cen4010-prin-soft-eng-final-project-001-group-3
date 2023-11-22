@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,36 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+    <!-- Search and Filter Section -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" id="titleSearch" class="form-control" placeholder="Search by Title...">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <div class="col-md-3">
+                <select id="genreFilter" class="form-control">
+                    <option value="">Select Genre</option>
+                    <!-- Add genre options here -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="platformFilter" class="form-control">
+                    <option value="">Select Platform</option>
+                    <!-- Add platform options here -->
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="tagFilter" class="form-control">
+                    <option value="">Select Tag</option>
+                    <!-- Add tag options here -->
+                </select>
+            </div>
+        </div>
+    </div>
+
     <nav>
         <ul class="nav nav-tab">
             <li class="ml-auto">
@@ -53,36 +83,34 @@
         <button onclick="nextPage()">Next Page</button>
     </div>
 
-     <script>
+    <script>
         let currentPage = 1;
         const itemsPerPage = 10; // Number of items to display per page
+        const apiKey = '48288ff667454f7681cb863cb83b9b82';
 
-        // Function to fetch and display games data from JSON with pagination
-        async function fetchData(page) {
+        // Function to fetch and display games data from JSON with pagination, search, and filters
+        async function fetchData(page, searchQuery = '', genre = '', platform = '', tag = '') {
             try {
-                // Calculate the offset based on the page number
                 const offset = (page - 1) * itemsPerPage;
+                const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
+                const genreParam = genre ? `&genres=${genre}` : '';
+                const platformParam = platform ? `&platforms=${platform}` : '';
+                const tagParam = tag ? `&tags=${tag}` : '';
 
-                // Make a GET request to the RAWG API with pagination parameters
-                const response = await fetch(`https://api.rawg.io/api/games?dates=2023-01-01,2023-11-01&ordering=-added&key=48288ff667454f7681cb863cb83b9b82&page_size=${itemsPerPage}&page=${page}&offset=${offset}`);
-                
-                // Check if the request was successful (status code 200)
+                const response = await fetch(`https://api.rawg.io/api/games?dates=2023-01-01,2023-11-01&ordering=-added&key=${apiKey}&page_size=${itemsPerPage}&page=${page}&offset=${offset}${searchParam}${genreParam}${platformParam}${tagParam}`);
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
 
-                // Parse the JSON data from the response
                 const jsonData = await response.json();
-
-                // Log the JSON data to the console to inspect its structure
                 console.log(jsonData);
-
-                // Display games data based on the current page
                 displayGamesData(jsonData);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         }
+
 
         // Function to display games data from JSON on the HTML page
         function displayGamesData(data) {
@@ -115,6 +143,25 @@
             }
         }
 
+        // Event listener for search button
+        document.querySelector('.btn-primary').addEventListener('click', searchGames);
+
+        // Event listener for pressing 'Enter' in the search field
+        document.querySelector('#titleSearch').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchGames();
+            }
+        });
+
+        function searchGames() {
+            const searchQuery = document.getElementById('titleSearch').value;
+            const genre = document.getElementById('genreFilter').value;
+            const platform = document.getElementById('platformFilter').value;
+            const tag = document.getElementById('tagFilter').value;
+
+            fetchData(1, searchQuery, genre, platform, tag);
+        }
+
         // Function to go to the previous page
         function prevPage() {
             if (currentPage > 1) {
@@ -129,8 +176,45 @@
             fetchData(currentPage);
         }
 
+        async function fetchRawgData(endpoint) {
+            try {
+                const response = await fetch(`https://api.rawg.io/api/${endpoint}?key=${apiKey}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        async function populateFilters() {
+            const genresData = await fetchRawgData('genres');
+            const platformsData = await fetchRawgData('platforms');
+            const tagsData = await fetchRawgData('tags');
+
+            populateSelect('genreFilter', genresData.results);
+            populateSelect('platformFilter', platformsData.results);
+            populateSelect('tagFilter', tagsData.results);
+        }
+
+        function populateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.id;
+                opt.textContent = option.name;
+                select.appendChild(opt);
+            });
+        }
+
         // Call the fetchData function when the page loads to show the initial page
-        window.onload = () => fetchData(currentPage);
+        window.onload = () => {
+            fetchData(currentPage);
+            populateFilters();
+        };
+
     </script>
 
     <footer>
@@ -138,4 +222,5 @@
     </footer>
 
 </body>
+
 </html>
