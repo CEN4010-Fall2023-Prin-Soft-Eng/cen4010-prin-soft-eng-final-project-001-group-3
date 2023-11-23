@@ -73,6 +73,7 @@
             </li>
         </ul>
     </nav>
+
     <div id="data-container">
         <!-- Data based on the desired key will be displayed here -->
     </div>
@@ -83,11 +84,14 @@
         <button onclick="nextPage()">Next Page</button>
     </div>
 
+    <!-- Modal container -->
+    <div id="modal-container"></div>
+
     <script>
         let currentPage = 1;
         const itemsPerPage = 10; // Number of items to display per page
         const apiKey = '48288ff667454f7681cb863cb83b9b82';
-
+    
         // Function to fetch and display games data from JSON with pagination, search, and filters
         async function fetchData(page, searchQuery = '', genre = '', platform = '', tag = '') {
             try {
@@ -96,13 +100,13 @@
                 const genreParam = genre ? `&genres=${genre}` : '';
                 const platformParam = platform ? `&platforms=${platform}` : '';
                 const tagParam = tag ? `&tags=${tag}` : '';
-
+    
                 const response = await fetch(`https://api.rawg.io/api/games?dates=2023-01-01,2023-11-01&ordering=-added&key=${apiKey}&page_size=${itemsPerPage}&page=${page}&offset=${offset}${searchParam}${genreParam}${platformParam}${tagParam}`);
-
+    
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
+    
                 const jsonData = await response.json();
                 console.log(jsonData);
                 displayGamesData(jsonData);
@@ -110,58 +114,98 @@
                 console.error('Error fetching data:', error);
             }
         }
-
-
+    
         // Function to display games data from JSON on the HTML page
         function displayGamesData(data) {
-            // Declare dataContainer outside the if statement
             const dataContainer = document.getElementById('data-container');
             const currentPageElement = document.getElementById('currentPage');
-
-            // Check if the "results" key exists in the JSON data
+            const modalContainer = document.getElementById('modal-container');
+    
             if ('results' in data) {
-                // Extract the "results" key and display relevant information
                 const gamesData = data.results;
-
+    
                 if (Array.isArray(gamesData) && gamesData.length > 0) {
-                    // Display each game with a background image
                     const gamesList = gamesData.map(game => {
                         const backgroundImage = game.background_image || 'default-image-url.jpg';
+                        const gameId = game.id;
+
+                        // Generate unique modal ID for each game
+                        const modalId = `reviewModal_${gameId}`;
+
+                        // Dynamically create a modal for each game
+                        const modalCode = `
+                            <div class="modal" id="${modalId}">
+                                <!-- Modal content for each game -->
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="gameTitle">Write a Review for ${game.name}</h4>
+                                            <button type="button" class="close" onclick="closeReviewModal()">&times;</button>
+                                        </div>
+                                        <!-- Modal Body -->
+                                        <div class="modal-body">
+                                            <textarea id="reviewText" class="form-control" placeholder="Write your review"></textarea>
+                                        </div>
+                                        <!-- Modal Footer -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Add the modal code to the modal container
+                        modalContainer.innerHTML += modalCode;
+
                         return `<div class="game-container" style="background-image: url(${backgroundImage})">
                                     <p>${game.name}</p>
+                                    <button class="btn btn-primary review-btn" data-toggle="modal" data-target="#${modalId}" data-game-id="${game.id}" data-game-name="${game.name}">
+                                        Write a Review
+                                    </button>
                                 </div>`;
                     }).join('');
-
+    
                     dataContainer.innerHTML = gamesList;
                     currentPageElement.textContent = `Page ${currentPage}`;
                 } else {
                     dataContainer.textContent = 'No games data available.';
                     currentPageElement.textContent = 'Page 1';
                 }
+
+                // Add event listener for review buttons
+                dataContainer.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('review-btn')) {
+                        const gameId = event.target.dataset.gameId;
+                        const gameName = event.target.dataset.gameName;
+                        openReviewModal(gameId, gameName);
+                    }
+                });
             } else {
                 dataContainer.textContent = 'No "results" key found in the data.';
             }
         }
-
+    
         // Event listener for search button
         document.querySelector('.btn-primary').addEventListener('click', searchGames);
-
+    
         // Event listener for pressing 'Enter' in the search field
         document.querySelector('#titleSearch').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 searchGames();
             }
         });
-
+    
         function searchGames() {
             const searchQuery = document.getElementById('titleSearch').value;
             const genre = document.getElementById('genreFilter').value;
             const platform = document.getElementById('platformFilter').value;
             const tag = document.getElementById('tagFilter').value;
-
+    
             fetchData(1, searchQuery, genre, platform, tag);
         }
-
+    
         // Function to go to the previous page
         function prevPage() {
             if (currentPage > 1) {
@@ -169,13 +213,13 @@
                 fetchData(currentPage);
             }
         }
-
+    
         // Function to go to the next page
         function nextPage() {
             currentPage++;
             fetchData(currentPage);
         }
-
+    
         async function fetchRawgData(endpoint) {
             try {
                 const response = await fetch(`https://api.rawg.io/api/${endpoint}?key=${apiKey}`);
@@ -188,17 +232,17 @@
                 return null;
             }
         }
-
+    
         async function populateFilters() {
             const genresData = await fetchRawgData('genres');
             const platformsData = await fetchRawgData('platforms');
             const tagsData = await fetchRawgData('tags');
-
+    
             populateSelect('genreFilter', genresData.results);
             populateSelect('platformFilter', platformsData.results);
             populateSelect('tagFilter', tagsData.results);
         }
-
+    
         function populateSelect(selectId, options) {
             const select = document.getElementById(selectId);
             options.forEach(option => {
@@ -208,13 +252,34 @@
                 select.appendChild(opt);
             });
         }
+    
+        let selectedGameId;
+        let selectedGameName;
+    
+        function openReviewModal(gameId, gameName) {
+            selectedGameId = gameId;
+            selectedGameName = gameName;
+            $('#reviewModal').modal('show');
+        }
 
-        // Call the fetchData function when the page loads to show the initial page
+        function closeReviewModal() {
+            // Optionally, you can perform any additional actions before closing the modal
+            $('#reviewModal').modal('hide');
+        }
+    
+        function submitReview() {
+            const reviewText = document.getElementById('reviewText').value;
+    
+            console.log(`Review submitted for ${selectedGameName} (ID: ${selectedGameId}): ${reviewText}`);
+    
+            // Optionally, you can close the modal
+            closeReviewModal();
+        }
+    
         window.onload = () => {
             fetchData(currentPage);
             populateFilters();
         };
-
     </script>
 
     <footer>
@@ -224,3 +289,4 @@
 </body>
 
 </html>
+
