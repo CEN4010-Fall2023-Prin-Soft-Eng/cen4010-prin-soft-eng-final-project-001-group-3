@@ -6,7 +6,7 @@ As of now, test html pages with live server extension.
 
 Team Members:
 
-Angi Demascio - Account / Sign in / Review functionality, Upvotes / Downvotes, Search bar
+Angi Demascio - Account / Sign in / Review functionality, Upvotes / Downvotes UI & functionality, Search bar UI & functionality, Profile UI & functionality
 
 James Yackanich -create basic reviews page/create basic home page/RECOMMENDED GAMES/Make Genre Tab Work Correctly/Add review option for each game
 
