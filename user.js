@@ -1,9 +1,11 @@
 const fs = require('fs').promises;
 
 class User {
-    constructor(username, password) {
+    constructor(username, password, profilePicture, description) {
         this.username = username;
         this.password = password;
+        this.profilePicture = profilePicture;
+        this.description = description;
     }
 
     save() {
@@ -13,7 +15,7 @@ class User {
     static find(username) {
         return fs.readFile(`./accounts/${username}.json`, 'utf8')
             .then(JSON.parse)
-            .then((user) => new User(user.username, user.password))
+            .then((user) => new User(user.username, user.password, user.profilePicture, user.description))
             .catch(() => null);
     }
 }

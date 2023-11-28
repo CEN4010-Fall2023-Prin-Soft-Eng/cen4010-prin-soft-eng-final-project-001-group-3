@@ -2,14 +2,17 @@ const { Game } = require('./game');
 const { User } = require('./user');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
-const express = require('express')
-const jwt = require('jsonwebtoken')
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
-const app = express()
+const app = express();
 const secretKey = 'the-secret-key';
 
-const swaggerJSDoc = require('swagger-jsdoc')
-const swaggerUi = require('swagger-ui-express')
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
@@ -40,8 +43,8 @@ function verifyToken(req, res, next) {
         return res.status(401).json({ message: 'Token not provided' });
     }
 
-    jwt.verify(token, secretKey, (err, decoded) => {
-        if (err) {
+    jwt.verify(token, secretKey, (error, decoded) => {
+        if (error) {
             return res.status(401).json({ message: 'Invalid token' });
         }
 
@@ -53,6 +56,15 @@ function verifyToken(req, res, next) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('./public'));
+app.use("/uploads", express.static('uploads'));
+
+if (!fs.existsSync('accounts')) {
+    fs.mkdirSync('accounts');
+}
+
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
 
 /**
  * @swagger
@@ -164,6 +176,111 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+// Configure Multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000 }, // Limit file size to 1MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+            cb(null, true);
+        } else {
+            cb(new Error("Only .jpg and .png files are accepted"), false);
+        }
+    }
+});
+
+/**
+ * @swagger
+ * /save-profile:
+ *   post:
+ *     summary: Update a user's profile
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: formData
+ *         name: description
+ *         description: The description of the user.
+ *       - in: formData
+ *         name: profilePicture
+ *         description: The profile picture of the user.
+ *     responses:
+ *       201:
+ *         description: Profile updated successfully
+ *       500:
+ *         description: Internal Server Error
+ */
+app.post('/save-profile', verifyToken, upload.single('profilePicture'), (req, res) => {
+    const { username } = req.user;
+    const description = req.body.description;
+    const picturePath = req.file ? req.file.path : null;
+
+    const userProfilePath = `accounts/${username}.json`;  // Path to the user's JSON file
+
+    // Read the existing user profile
+    fs.readFile(userProfilePath, (error, data) => {
+        if (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Error reading profile file' });
+        }
+
+        let userProfile = JSON.parse(data.toString());
+
+        // Update only the relevant fields
+        if (description) userProfile.description = description;
+        if (picturePath) userProfile.profilePicture = picturePath;
+
+        // Write the updated data back to the JSON file
+        fs.writeFile(userProfilePath, JSON.stringify(userProfile, null, 2), err => {
+            if (error) {
+                console.error(error);
+                return res.status(500).json({ message: 'Error writing to file' });
+            }
+            res.json({ message: 'Profile updated successfully' });
+        });
+    });
+});
+
+/**
+ * @swagger
+ * /profile-picture:
+ *   get:
+ *     summary: Get the profile picture URL of the logged-in user
+ *     security:
+ *       - Bearer: []
+ *     responses:
+ *       200:
+ *         description: Profile picture URL retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/profile-picture', verifyToken, async (req, res) => {
+    try {
+        const { username } = req.user;
+        const user = await User.find(username);
+
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ profilePicture: user.profilePicture });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 
 /**
  * @swagger
