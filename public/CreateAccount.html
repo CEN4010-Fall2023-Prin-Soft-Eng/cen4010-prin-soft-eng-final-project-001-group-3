@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,25 +8,48 @@
     <title>Create Account page</title>
     <link rel="stylesheet" href="CreateAccount.css">
 </head>
+
 <body>
     <div class="signup-box">
         <h1>Create Account</h1>
-        <form>
-            <label>First Name</label>
-            <input type="text" placeholder="">
-            <label>Last Name</label>
-            <input type="text" placeholder="">
-            <label>Email</label>
-            <input type="email" placeholder="">
+        <form id="createAccountForm">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter Username">
             <label>Password</label>
-            <input type="password" placeholder="">
-            <label>Confirm Password</label>
-            <input type="password" placeholder="">
-            <input type="button" value="Submit">
+            <input type="password" name="password" placeholder="Enter Password">
+            <button type="submit">Create Account</button>
         </form>
     </div>
-    <a class="nav-link" href="Signin.html">Sign in</a>
-    <a class="nav-link" href="homepage.html">Back To Home</a>
 
+    <script>
+        document.getElementById('createAccountForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const username = formData.get('username');
+            const password = formData.get('password');
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.href = '/Signin.html';
+                } else {
+                    // Show error message
+                    alert(data.message);
+                }
+
+            } catch (error) {
+                alert('Network error: ' + error);
+            }
+        });
+    </script>
 </body>
+
 </html>
