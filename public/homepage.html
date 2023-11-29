@@ -66,6 +66,24 @@
     <!-- Modal container -->
     <div id="modal-container"></div>
 
+    <!-- Single Modal for Game Reviews -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="gameTitle">Write a Review</h4>
+                    <button type="button" class="close" onclick="closeReviewModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="reviewText" class="form-control" placeholder="Write your review"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentPage = 1;
         const itemsPerPage = 10; // Number of items to display per page
@@ -87,7 +105,7 @@
                 }
 
                 const jsonData = await response.json();
-                console.log(jsonData);
+
                 displayGamesData(jsonData);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -108,41 +126,17 @@
                         const backgroundImage = game.background_image || 'default-image-url.jpg';
                         const gameId = game.id;
 
-                        // Generate unique modal ID for each game
-                        const modalId = `reviewModal_${gameId}`;
-
-                        // Dynamically create a modal for each game
-                        const modalCode = `
-                            <div class="modal" id="${modalId}">
-                                <!-- Modal content for each game -->
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <!-- Modal Header -->
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="gameTitle">Write a Review for ${game.name}</h4>
-                                            <button type="button" class="close" onclick="closeReviewModal()">&times;</button>
-                                        </div>
-                                        <!-- Modal Body -->
-                                        <div class="modal-body">
-                                            <textarea id="reviewText" class="form-control" placeholder="Write your review"></textarea>
-                                        </div>
-                                        <!-- Modal Footer -->
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-primary" onclick="submitReview()">Submit Review</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-
-                        // Add the modal code to the modal container
-                        modalContainer.innerHTML += modalCode;
+                        const gameName = game.name.replace(/'/g, "\\'"); // Escape single quotes in game name
 
                         return `<div class="game-container" style="background-image: url(${backgroundImage})">
                                     <p>${game.name}</p>
-                                    <button class="btn btn-primary review-btn" data-toggle="modal" data-target="#${modalId}" data-game-id="${game.id}" data-game-name="${game.name}">
-                                        Show all Reviews
-                                    </button>
+                                    <a href="game.html?gameId=${game.id}">
+                                        <button class="btn btn-primary">
+                                            Show all Reviews
+                                        </button>
+                                    </a>
+                                    <button class="btn thumbs-up" onclick="openReviewModal(${game.id}, '${gameName}', true)"> 👍 </button>
+                                    <button class="btn thumbs-down" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
                                 </div>`;
                     }).join('');
 
@@ -152,15 +146,6 @@
                     dataContainer.textContent = 'No games data available.';
                     currentPageElement.textContent = 'Page 1';
                 }
-
-                // Add event listener for review buttons
-                dataContainer.addEventListener('click', function (event) {
-                    if (event.target.classList.contains('review-btn')) {
-                        const gameId = event.target.dataset.gameId;
-                        const gameName = event.target.dataset.gameName;
-                        openReviewModal(gameId, gameName);
-                    }
-                });
             } else {
                 dataContainer.textContent = 'No "results" key found in the data.';
             }
@@ -235,25 +220,48 @@
         let selectedGameId;
         let selectedGameName;
 
-        function openReviewModal(gameId, gameName) {
+        function openReviewModal(gameId, gameName, thumbsup) {
+            let emoji = thumbsup ? '👍' : '👎';
+
             selectedGameId = gameId;
             selectedGameName = gameName;
+
+            document.getElementById('gameTitle').textContent = `${emoji} Write a Review for ${gameName}`;
             $('#reviewModal').modal('show');
         }
 
         function closeReviewModal() {
-            // Optionally, you can perform any additional actions before closing the modal
             $('#reviewModal').modal('hide');
         }
 
-        function submitReview() {
+        async function submitReview() {
             const reviewText = document.getElementById('reviewText').value;
+            const token = localStorage.getItem('token');
 
-            console.log(`Review submitted for ${selectedGameName} (ID: ${selectedGameId}): ${reviewText}`);
+            try {
+                const response = await fetch(`/review/${selectedGameId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ reviewText })
+                });
 
-            // Optionally, you can close the modal
+                const result = await response.json();
+
+                if (response.status === 201) {
+                    alert('Review added successfully');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error while submitting review: ' + error);
+            }
+
             closeReviewModal();
         }
+
 
         async function updateAccountSection() {
             const accountSection = document.getElementById('accountSection');
@@ -270,9 +278,14 @@
                 const profilePicture = (await response.json()).profilePicture;
 
                 accountSection.innerHTML = `
-            <img src="${profilePicture}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
-            <a class="nav-link" href="profile.html">My Profile</a>
-        `;
+                <div style="display: flex;">
+                    <img src="${profilePicture}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <a class="nav-link" href="profile.html" style="text-align: right;">My Profile</a>
+                        <a class="nav-link" href="#" onclick="logout()" style="text-align: right;">Logout</a>
+                    </div>
+                </div>
+            `;
             } else {
                 accountSection.innerHTML = `
             <a class="nav-link" href="Signin.html">Sign in</a>
@@ -280,6 +293,12 @@
         `;
             }
         }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.reload();
+        }
+
 
         window.onload = () => {
             fetchData(currentPage);

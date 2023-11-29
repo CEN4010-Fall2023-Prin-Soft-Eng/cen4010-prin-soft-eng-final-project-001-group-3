@@ -9,6 +9,7 @@
     height: 200px;
     /* Set a fixed height for each game container */
     background-repeat: no-repeat;
+    position: relative;
 }
 
 body {
@@ -56,4 +57,23 @@ header {
 #data-container {
     padding-top: 20px;
     /* Adjust this value as needed for spacing below the header */
+}
+
+.thumbs-up,
+.thumbs-down {
+    position: absolute;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
+}
+
+.thumbs-up {
+    top: 10px;
+    right: 70px;
+}
+
+.thumbs-down {
+    top: 10px;
+    right: 20px;
 }
