@@ -115,7 +115,9 @@ app.post('/signup', async (req, res) => {
         // Create a new user
         const user = new User(
             username,
-            hashedPassword
+            hashedPassword,
+            "",
+            ""
         );
 
         await user.save();
@@ -249,27 +251,27 @@ app.post('/save-profile', verifyToken, upload.single('profilePicture'), (req, re
                 console.error(error);
                 return res.status(500).json({ message: 'Error writing to file' });
             }
-            res.json({ message: 'Profile updated successfully' });
+            res.status(201).json({ message: 'Profile updated successfully' });
         });
     });
 });
 
 /**
  * @swagger
- * /profile-picture:
+ * /profile-data:
  *   get:
- *     summary: Get the profile picture URL of the logged-in user
+ *     summary: Get the profile data of the logged-in user
  *     security:
  *       - Bearer: []
  *     responses:
  *       200:
- *         description: Profile picture URL retrieved successfully
+ *         description: Profile data retrieved successfully
  *       401:
  *         description: Unauthorized
  *       500:
  *         description: Internal Server Error
  */
-app.get('/profile-picture', verifyToken, async (req, res) => {
+app.get('/profile-data', verifyToken, async (req, res) => {
     try {
         const { username } = req.user;
         const user = await User.find(username);
@@ -278,7 +280,7 @@ app.get('/profile-picture', verifyToken, async (req, res) => {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ profilePicture: user.profilePicture });
+        res.status(200).json({ profilePicture: user.profilePicture, description: user.description });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });

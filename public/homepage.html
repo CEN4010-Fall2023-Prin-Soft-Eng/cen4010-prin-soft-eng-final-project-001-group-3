@@ -268,7 +268,7 @@
             const token = localStorage.getItem('token');
 
             if (token !== null) {
-                const response = await fetch('/profile-picture', {
+                const response = await fetch('/profile-data', {
                     method: 'GET',
                     headers: {
                         'Authorization': token

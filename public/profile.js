@@ -1,21 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    let newProfilePictureDataUrl = null; // Temporary storage for the new profile picture
-
-    // Function to save all profile information in JSON format
-    function saveProfileInfo() {
-        const profileData = {
-            userDescription: document.getElementById('description').value,
-            profilePicture: newProfilePictureDataUrl || document.getElementById('profilePictureDisplay').src
-        };
-
-        // Save the profile data to localStorage
-        localStorage.setItem('profileData', JSON.stringify(profileData));
-        alert('Profile information saved successfully!');
-
-        // Clear the temporary image data URL after saving
-        newProfilePictureDataUrl = null;
-    }
-
     // Toggle read-only state of the profile fields and show/hide the file input
     function toggleEditProfile(editing) {
         document.getElementById('description').readOnly = !editing;
@@ -36,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event listener for the Save Profile button
     document.getElementById('saveProfileBtn').addEventListener('click', function () {
-        saveProfileInfo();
         toggleEditProfile(false);
     });
 
@@ -45,8 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const reader = new FileReader();
         reader.onload = function (event) {
             // Update the display picture src with the selected file's data URL
-            newProfilePictureDataUrl = event.target.result; // Store the new data URL temporarily
-            document.getElementById('profilePictureDisplay').src = newProfilePictureDataUrl;
+            document.getElementById('profilePictureDisplay').src = event.target.result;
         };
         reader.readAsDataURL(this.files[0]);
     });
@@ -67,13 +48,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const result = await response.json();
 
-            if (result.success) {
-                alert('Profile updated successfully!');
-            } else {
-                alert(result.message);
-            }
+            alert(result.message);
         } catch (error) {
             alert("Error updating profile:" + error);
         }
     });
+
+    async function loadProfileData() {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/profile-data', {
+            method: 'GET',
+            headers: {
+                'Authorization': token
+            }
+        });
+
+        const result = await response.json();
+
+        document.getElementById('description').value = result.description;
+        document.getElementById('profilePictureDisplay').src = result.profilePicture;
+    }
+
+    loadProfileData();
 });
