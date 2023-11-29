@@ -66,9 +66,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const result = await response.json();
-            console.log(result);
+
+            if (result.success) {
+                alert('Profile updated successfully!');
+            } else {
+                alert(result.message);
+            }
         } catch (error) {
-            console.error("Error updating profile:", error);
+            alert("Error updating profile:" + error);
         }
     });
 });
