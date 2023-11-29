@@ -3,20 +3,16 @@
     padding: 10px;
     border: 1px solid #ccc;
     background-size: contain;
-    /* Set the background size to "contain" */
     background-position: center;
     color: black;
     height: 200px;
-    /* Set a fixed height for each game container */
     background-repeat: no-repeat;
     position: relative;
 }
 
 body {
     position: relative;
-    /* Add this to ensure positioning is relative to the body */
     padding-top: 65px;
-    /* Adjust this value as needed to avoid overlap with the nav */
 }
 
 .top-bar {
@@ -24,39 +20,26 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
-    /* Adjust the padding as needed */
     position: absolute;
     width: 100%;
     top: 0;
-    /* Adjust if needed */
-    z-index: 1000;
-    /* Ensure it's above other elements */
 }
 
 #accountSection {
     position: absolute;
-    /* Position the account section absolutely */
     right: 15px;
-    /* Align with the right edge of the page */
     top: 15px;
-    /* Align it at the same vertical level as the search bar */
-    z-index: 1000;
-    /* Ensure it's above other elements */
     display: flex;
     justify-content: flex-end;
-    /* Aligns the child elements (the circle) to the right */
-    width: 100%;
-    /* Ensures the container takes the full width */
+    width: 10%;
 }
 
 header {
     margin-top: 80px;
-    /* Adjust this value as needed for appropriate spacing */
 }
 
 #data-container {
     padding-top: 20px;
-    /* Adjust this value as needed for spacing below the header */
 }
 
 .thumbs-up,
