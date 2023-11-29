@@ -36,6 +36,13 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions)
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from the root directory
+app.use(express.static(__dirname));
+
+
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
 
@@ -57,6 +64,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('./public'));
 app.use("/uploads", express.static('uploads'));
+
+
 
 if (!fs.existsSync('accounts')) {
     fs.mkdirSync('accounts');
@@ -592,6 +601,78 @@ app.get('/games/search', async (req, res) => {
 app.get('/game/:id', async (req, res) => {
 });
 
+/**
+ * @swagger
+ * /search:
+ *   get:
+ *     summary: Search JSON files for a specific key
+ *     tags:
+ *       - Search
+ *     parameters:
+ *       - in: query
+ *         name: key
+ *         required: true
+ *         description: The key to search for in JSON files.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               - filename: example.json
+ *                 dataWithKey: "some value"
+ *       500:
+ *         description: Internal Server Error
+ */
+app.get('/search', async (req, res) => {
+    try {
+      // Get the key from the query parameters
+      const keyToSearch = req.query.key;
+  
+      // Specify the folder where JSON files are stored
+      const folderPath = path.join(__dirname, 'games');
+  
+      // Read the list of files in the folder
+      const files = await fs.promises.readdir(folderPath);
+  
+      // Initialize a list to store results
+      const results = [];
+  
+      // Loop through each file
+      for (const filename of files) {
+        if (filename.endsWith('.json')) {
+          const filePath = path.join(folderPath, filename);
+  
+          // Read the JSON file
+          const data = await fs.promises.readFile(filePath, 'utf8');
+  
+          try {
+            const jsonData = JSON.parse(data);
+  
+            // Check if the key is present in the JSON data
+            if (jsonData.title === keyToSearch) {
+              // If the key and value are found, add entire JSON data to the results
+              const resultInfo = {
+                filename: filename,
+                data: jsonData,
+              };
+              results.push(resultInfo);
+            }
+          } catch (jsonError) {
+            console.error(`Error parsing JSON in file ${filename}: ${jsonError.message}`);
+          }
+        }
+      }
+  
+      // Return the results as JSON
+      res.json(results);
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 const port = process.env.PORT || 5678;
 
 console.log(`Server listening at ${port}`);

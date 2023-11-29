@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    
 </head>
 
 <body>
@@ -84,6 +85,7 @@
         </div>
     </div>
 
+    
     <script>
         let currentPage = 1;
         const itemsPerPage = 10; // Number of items to display per page
@@ -114,42 +116,81 @@
 
         // Function to display games data from JSON on the HTML page
         function displayGamesData(data) {
-            const dataContainer = document.getElementById('data-container');
-            const currentPageElement = document.getElementById('currentPage');
-            const modalContainer = document.getElementById('modal-container');
+    const dataContainer = document.getElementById('data-container');
+    const currentPageElement = document.getElementById('currentPage');
+    const modalContainer = document.getElementById('modal-container');
 
-            if ('results' in data) {
-                const gamesData = data.results;
+    if ('results' in data) {
+        const gamesData = data.results;
 
-                if (Array.isArray(gamesData) && gamesData.length > 0) {
-                    const gamesList = gamesData.map(game => {
-                        const backgroundImage = game.background_image || 'default-image-url.jpg';
-                        const gameId = game.id;
+        if (Array.isArray(gamesData) && gamesData.length > 0) {
+            const gamesList = gamesData.map(game => {
+                const backgroundImage = game.background_image || 'default-image-url.jpg';
+                const gameId = game.id;
 
-                        const gameName = game.name.replace(/'/g, "\\'"); // Escape single quotes in game name
+                const gameName = game.name.replace(/'/g, "\\'");
 
-                        return `<div class="game-container" style="background-image: url(${backgroundImage})">
-                                    <p>${game.name}</p>
-                                    <a href="game.html?gameId=${game.id}">
-                                        <button class="btn btn-primary">
-                                            Show all Reviews
-                                        </button>
-                                    </a>
-                                    <button class="btn thumbs-up" onclick="openReviewModal(${game.id}, '${gameName}', true)"> 👍 </button>
-                                    <button class="btn thumbs-down" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
-                                </div>`;
-                    }).join('');
+                return `<div class="game-container" style="background-image: url(${backgroundImage})">
+                    <p>${game.name}</p>
+                    <button class="resultsbutton" data-game-name="${gameName}">Show all Reviews</button>
+                    <button class="btn thumbs-up" onclick="openReviewModal(${game.id}, '${gameName}', true)"> 👍 </button>
+                    <button class="btn thumbs-down" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
+                </div>`;
+            }).join('');
 
-                    dataContainer.innerHTML = gamesList;
-                    currentPageElement.textContent = `Page ${currentPage}`;
-                } else {
-                    dataContainer.textContent = 'No games data available.';
-                    currentPageElement.textContent = 'Page 1';
-                }
-            } else {
-                dataContainer.textContent = 'No "results" key found in the data.';
-            }
+            dataContainer.innerHTML = gamesList;
+            currentPageElement.textContent = `Page ${currentPage}`;
+
+            // Add event listeners to the new buttons
+            addEventListenersToButtons();
+        } else {
+            dataContainer.textContent = 'No games data available.';
+            currentPageElement.textContent = 'Page 1';
         }
+    } else {
+        dataContainer.textContent = 'No "results" key found in the data.';
+    }
+}
+
+// Function to add event listeners to the buttons
+function addEventListenersToButtons() {
+    // Get all elements with the class "resultsbutton"
+    const searchButtons = document.querySelectorAll('.resultsbutton');
+
+    // Add a click event listener to each button
+    searchButtons.forEach(searchButton => {
+        searchButton.addEventListener('click', async function () {
+            try {
+                // Get the key from the data attribute of the button (assuming gameName is stored as a data attribute)
+                const keyToSearch = searchButton.dataset.gameName;
+                console.log(keyToSearch);
+
+                // Make a request to the /search endpoint with the entered key
+                const response = await fetch(`/search?key=${keyToSearch}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Parse the JSON response
+                const searchData = await response.json();
+
+                // Encode the JSON data as a URI component
+                const encodedData = encodeURIComponent(JSON.stringify(searchData));
+
+                // Construct the URL for the game.html page with the JSON data as a query parameter
+                const gameUrl = `/game.html?data=${encodedData}`;
+
+                // Navigate to the game.html page
+                window.location.href = gameUrl;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error fetching or navigating to the game page. See console for details.');
+            }
+        });
+    });
+}
+
 
         // Event listener for search button
         document.querySelector('.btn-primary').addEventListener('click', searchGames);
@@ -305,6 +346,47 @@
             populateFilters();
             updateAccountSection();
         };
+
+
+        
+        setTimeout(async function () {
+// Get all elements with the class "resultsbutton"
+const searchButtons = document.querySelectorAll('.resultsbutton');
+
+// Add a click event listener to each button
+searchButtons.forEach(searchButton => {
+    searchButton.addEventListener('click', async function () {
+        try {
+            // Get the key from the data attribute of the button (assuming gameName is stored as a data attribute)
+            const keyToSearch = searchButton.dataset.gameName;
+            console.log(keyToSearch);
+
+            // Make a request to the /search endpoint with the entered key
+            const response = await fetch(`/search?key=${keyToSearch}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            // Parse the JSON response
+            const searchData = await response.json();
+
+            // Encode the JSON data as a URI component
+            const encodedData = encodeURIComponent(JSON.stringify(searchData));
+
+            // Construct the URL for the game.html page with the JSON data as a query parameter
+            const gameUrl = `/game.html?data=${encodedData}`;
+
+            // Navigate to the game.html page
+            window.location.href = gameUrl;
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error fetching or navigating to the game page. See console for details.');
+        }
+    });
+});
+
+}, 1000); // Adjust the delay time as needed
     </script>
 
     <footer>
