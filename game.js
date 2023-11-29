@@ -1,5 +1,7 @@
 const { Review } = require('./review');
 const fs = require('fs').promises;
+const fetch = require('node-fetch');
+const apiKey = '48288ff667454f7681cb863cb83b9b82';
 
 class Game {
     constructor(id, title, reviews, reviewers) {
@@ -29,11 +31,27 @@ class Game {
         return fs.writeFile(`./games/${this.id}.json`, JSON.stringify(this));
     }
 
-    static find(id) {
-        return fs.readFile(`./games/${id}.json`, 'utf8')
-            .then(JSON.parse)
-            .then((game) => new Game(game.id, game.title, game.reviews, game.reviewers))
-            .catch(() => null);
+    static async find(id) {
+        try {
+            const fileData = await fs.readFile(`./games/${id}.json`, 'utf8');
+            const game = JSON.parse(fileData);
+            return new Game(game.id, game.title, game.reviews, game.reviewers);
+        } catch (error) {
+            // Fetch from RAWG API if file not found
+            try {
+                const response = await fetch(`https://api.rawg.io/api/games/${id}?key=${apiKey}`);
+                const data = await response.json();
+
+                if (data.detail === "Not found.") {
+                    return null; // Game not found in RAWG API
+                }
+
+                return new Game(data.id, data.name, [], []);
+            } catch (error) {
+                console.error('Error fetching from RAWG API: ', error);
+                return null;
+            }
+        }
     }
 }
 

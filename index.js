@@ -66,6 +66,10 @@ if (!fs.existsSync('uploads')) {
     fs.mkdirSync('uploads');
 }
 
+if (!fs.existsSync('games')) {
+    fs.mkdirSync('games');
+}
+
 /**
  * @swagger
  * /signup:
