@@ -13,7 +13,7 @@ class Game {
         }
 
         this.reviews = reviews;
-        this.reviewers = reviewers;  // Track usernames that have submitted reviews
+        this.reviewers = reviewers;
     }
 
     addReview(username, text) {
@@ -37,13 +37,12 @@ class Game {
             const game = JSON.parse(fileData);
             return new Game(game.id, game.title, game.reviews, game.reviewers);
         } catch (error) {
-            // Fetch from RAWG API if file not found
             try {
                 const response = await fetch(`https://api.rawg.io/api/games/${id}?key=${apiKey}`);
                 const data = await response.json();
 
                 if (data.detail === "Not found.") {
-                    return null; // Game not found in RAWG API
+                    return null;
                 }
 
                 return new Game(data.id, data.name, [], []);

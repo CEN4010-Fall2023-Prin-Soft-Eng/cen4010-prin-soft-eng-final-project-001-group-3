@@ -5,19 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRP 3 Game Reviews</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <!-- Bootstrap JS and Popper.js (required for Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="styles.css">
-    
 </head>
 
 <body>
-    <!-- Search and Filter Section -->
     <div class="top-bar">
         <div class="container mt-4">
             <div class="row">
@@ -55,7 +51,7 @@
     </header>
 
     <div id="data-container">
-        <!-- Data based on the desired key will be displayed here -->
+        <!-- Game data gets added here -->
     </div>
 
     <div id="pagination">
@@ -64,10 +60,8 @@
         <button onclick="nextPage()">Next Page</button>
     </div>
 
-    <!-- Modal container -->
     <div id="modal-container"></div>
 
-    <!-- Single Modal for Game Reviews -->
     <div class="modal" id="reviewModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -85,10 +79,9 @@
         </div>
     </div>
 
-    
     <script>
         let currentPage = 1;
-        const itemsPerPage = 10; // Number of items to display per page
+        const itemsPerPage = 10;
         const apiKey = '48288ff667454f7681cb863cb83b9b82';
 
         // Function to fetch and display games data from JSON with pagination, search, and filters
@@ -114,21 +107,20 @@
             }
         }
 
-        // Function to display games data from JSON on the HTML page
         function displayGamesData(data) {
-    const dataContainer = document.getElementById('data-container');
-    const currentPageElement = document.getElementById('currentPage');
-    const modalContainer = document.getElementById('modal-container');
+            const dataContainer = document.getElementById('data-container');
+            const currentPageElement = document.getElementById('currentPage');
+            const modalContainer = document.getElementById('modal-container');
 
-    if ('results' in data) {
-        const gamesData = data.results;
+            if ('results' in data) {
+                const gamesData = data.results;
 
-        if (Array.isArray(gamesData) && gamesData.length > 0) {
-            const gamesList = gamesData.map(game => {
-                const backgroundImage = game.background_image || 'default-image-url.jpg';
-                const gameId = game.id;
+                if (Array.isArray(gamesData) && gamesData.length > 0) {
+                    const gamesList = gamesData.map(game => {
+                        const backgroundImage = game.background_image || 'default-image-url.jpg';
+                        const gameId = game.id;
 
-                const gameName = game.name.replace(/'/g, "\\'");
+                        const gameName = game.name.replace(/'/g, "\\'"); // Escape single quotes in game name
 
                         return `
                             <div class="game-container" style="background-image: url(${backgroundImage})">
@@ -138,18 +130,18 @@
                     <button class="btn thumbs-down" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
                             </div>
                         `;
-            }).join('');
+                    }).join('');
 
-            dataContainer.innerHTML = gamesList;
-            currentPageElement.textContent = `Page ${currentPage}`;
-        } else {
-            dataContainer.textContent = 'No games data available.';
-            currentPageElement.textContent = 'Page 1';
+                    dataContainer.innerHTML = gamesList;
+                    currentPageElement.textContent = `Page ${currentPage}`;
+                } else {
+                    dataContainer.textContent = 'No games data available.';
+                    currentPageElement.textContent = 'Page 1';
+                }
+            } else {
+                dataContainer.textContent = 'No "results" key found in the data.';
+            }
         }
-    } else {
-        dataContainer.textContent = 'No "results" key found in the data.';
-    }
-}
 
         document.querySelector('.btn-primary').addEventListener('click', searchGames);
 
@@ -168,7 +160,6 @@
             fetchData(1, searchQuery, genre, platform, tag);
         }
 
-        // Function to go to the previous page
         function prevPage() {
             if (currentPage > 1) {
                 currentPage -= 1;
@@ -176,7 +167,6 @@
             }
         }
 
-        // Function to go to the next page
         function nextPage() {
             currentPage += 1;
             fetchData(currentPage);
