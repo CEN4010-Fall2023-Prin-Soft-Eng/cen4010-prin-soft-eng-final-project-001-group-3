@@ -72,6 +72,8 @@ if (!fs.existsSync('games')) {
     fs.mkdirSync('games');
 }
 
+const DEFAULT_PICTURE = "https://e7.pngegg.com/pngimages/753/432/png-clipart-user-profile-2018-in-sight-user-conference-expo-business-default-business-angle-service-thumbnail.png";
+
 /**
  * @swagger
  * /signup:
@@ -118,7 +120,7 @@ app.post('/signup', async (req, res) => {
         const user = new User(
             username,
             hashedPassword,
-            "",
+            DEFAULT_PICTURE,
             ""
         );
 
