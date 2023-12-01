@@ -1,0 +1,53 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header h1 a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+header h1 a:hover {
+    color: #0056b3;
+}
+
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item {
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.review-title {
+    color: #007bff;
+}
+
+.thumbs-up,
+.thumbs-down {
+    position: absolute;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+}
+
+.thumbs-up {
+    top: 5px;
+    right: 70px;
+}
+
+.thumbs-down {
+    top: 5px;
+    right: 2px;
+}

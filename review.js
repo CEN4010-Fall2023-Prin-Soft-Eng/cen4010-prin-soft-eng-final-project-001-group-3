@@ -2,34 +2,44 @@ class Review {
     constructor(username, text) {
         this.username = username;
         this.text = text;
-        this.votes = 0;
-        this.voters = []; // To keep track of who has voted
+        this.positiveVotes = 0;
+        this.negativeVotes = 0;
+        this.voters = {};
     }
 
     upvote(username) {
-        if (this.voters.includes(username)) {
-            return 'You have already voted on this review';
-        }
         if (this.username === username) {
             return 'You cannot upvote your own review';
         }
-        this.votes += 1;
-        this.voters.push(username);
 
+        if (this.voters[username] === 'downvote') {
+            this.negativeVotes -= 1;
+            this.positiveVotes += 1;
+        } else if (!this.voters[username]) {
+            this.positiveVotes += 1;
+        } else {
+            return 'You have already upvoted this review';
+        }
+
+        this.voters[username] = 'upvote';
         return null;
     }
 
     downvote(username) {
-        if (this.voters.includes(username)) {
-            return 'You have already voted on this review';
-        }
-
         if (this.username === username) {
             return 'You cannot downvote your own review';
         }
-        this.votes -= 1;
-        this.voters.push(username);
 
+        if (this.voters[username] === 'upvote') {
+            this.positiveVotes -= 1;
+            this.negativeVotes += 1;
+        } else if (!this.voters[username]) {
+            this.negativeVotes += 1;
+        } else {
+            return 'You have already downvoted this review';
+        }
+
+        this.voters[username] = 'downvote';
         return null;
     }
 }

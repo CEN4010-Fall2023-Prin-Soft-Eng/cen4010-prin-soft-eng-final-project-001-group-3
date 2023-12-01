@@ -36,13 +36,6 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions)
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve static files from the root directory
-app.use(express.static(__dirname));
-
-
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
 
@@ -468,7 +461,7 @@ app.post('/upvote/:gameId/:reviewId', verifyToken, async (req, res) => {
 
         await game.save();
 
-        res.status(200).json({ message: 'Upvote successful' });
+        res.status(200).json({ message: 'Upvote successful', positiveVotes: review.positiveVotes, negativeVotes: review.negativeVotes });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -523,7 +516,7 @@ app.post('/downvote/:gameId/:reviewId', verifyToken, async (req, res) => {
 
         await game.save();
 
-        res.status(200).json({ message: 'Downvote successful' });
+        res.status(200).json({ message: 'Downvote successful', positiveVotes: review.positiveVotes, negativeVotes: review.negativeVotes });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -548,40 +541,6 @@ app.get('/games', async (req, res) => {
 
 /**
  * @swagger
- * /games/search:
- *   get:
- *     summary: Search for games by criteria
- *     description: Search for games by title, genre, platform, and/or tag.
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: formData
- *         name: title
- *         required: false
- *         description: The title of the game to search for.
- *       - in: formData
- *         name: genre
- *         required: false
- *         description: The genre of the game to search for.
- *       - in: formData
- *         name: platform
- *         required: false
- *         description: The platform of the game to search for.
- *       - in: formData
- *         name: tag
- *         required: false
- *         description: The tag of the game to search for.
- *     responses:
- *       200:
- *         description: 
- *       500:
- *         description: Internal Server Error
- */
-app.get('/games/search', async (req, res) => {
-});
-
-/**
- * @swagger
  * /games/{id}:
  *   get:
  *     summary: Get a game by ID
@@ -595,84 +554,29 @@ app.get('/games/search', async (req, res) => {
  *     responses:
  *       200:
  *         description: Game retrieved successfully
+ *       404:
+ *         description: Game not found
  *       500:
  *         description: Internal Server Error
  */
 app.get('/game/:id', async (req, res) => {
+    try {
+        const gameDetails = await Game.find(req.params.id);
+
+        if (gameDetails) {
+            for (const review of gameDetails.reviews) {
+                const user = await User.find(review.username);
+                review.profilePicture = user.profilePicture;
+            }
+            res.status(200).json(gameDetails);
+        } else {
+            res.status(404).send('Game not found');
+        }
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-/**
- * @swagger
- * /search:
- *   get:
- *     summary: Search JSON files for a specific key
- *     tags:
- *       - Search
- *     parameters:
- *       - in: query
- *         name: key
- *         required: true
- *         description: The key to search for in JSON files.
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Successful response
- *         content:
- *           application/json:
- *             example:
- *               - filename: example.json
- *                 dataWithKey: "some value"
- *       500:
- *         description: Internal Server Error
- */
-app.get('/search', async (req, res) => {
-    try {
-      // Get the key from the query parameters
-      const keyToSearch = req.query.key;
-  
-      // Specify the folder where JSON files are stored
-      const folderPath = path.join(__dirname, 'games');
-  
-      // Read the list of files in the folder
-      const files = await fs.promises.readdir(folderPath);
-  
-      // Initialize a list to store results
-      const results = [];
-  
-      // Loop through each file
-      for (const filename of files) {
-        if (filename.endsWith('.json')) {
-          const filePath = path.join(folderPath, filename);
-  
-          // Read the JSON file
-          const data = await fs.promises.readFile(filePath, 'utf8');
-  
-          try {
-            const jsonData = JSON.parse(data);
-  
-            // Check if the key is present in the JSON data
-            if (jsonData.title === keyToSearch) {
-              // If the key and value are found, add entire JSON data to the results
-              const resultInfo = {
-                filename: filename,
-                data: jsonData,
-              };
-              results.push(resultInfo);
-            }
-          } catch (jsonError) {
-            console.error(`Error parsing JSON in file ${filename}: ${jsonError.message}`);
-          }
-        }
-      }
-  
-      // Return the results as JSON
-      res.json(results);
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
 const port = process.env.PORT || 5678;
 
 console.log(`Server listening at ${port}`);

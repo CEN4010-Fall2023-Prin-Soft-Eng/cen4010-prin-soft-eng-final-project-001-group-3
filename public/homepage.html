@@ -130,19 +130,18 @@
 
                 const gameName = game.name.replace(/'/g, "\\'");
 
-                return `<div class="game-container" style="background-image: url(${backgroundImage})">
+                        return `
+                            <div class="game-container" style="background-image: url(${backgroundImage})">
                     <p>${game.name}</p>
-                    <button class="resultsbutton" data-game-name="${gameName}">Show all Reviews</button>
+                                <a href="game.html?gameId=${game.id}"><button class="btn btn-primary">Show all Reviews</button></a>
                     <button class="btn thumbs-up" onclick="openReviewModal(${game.id}, '${gameName}', true)"> 👍 </button>
                     <button class="btn thumbs-down" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
-                </div>`;
+                            </div>
+                        `;
             }).join('');
 
             dataContainer.innerHTML = gamesList;
             currentPageElement.textContent = `Page ${currentPage}`;
-
-            // Add event listeners to the new buttons
-            addEventListenersToButtons();
         } else {
             dataContainer.textContent = 'No games data available.';
             currentPageElement.textContent = 'Page 1';
@@ -152,50 +151,8 @@
     }
 }
 
-// Function to add event listeners to the buttons
-function addEventListenersToButtons() {
-    // Get all elements with the class "resultsbutton"
-    const searchButtons = document.querySelectorAll('.resultsbutton');
-
-    // Add a click event listener to each button
-    searchButtons.forEach(searchButton => {
-        searchButton.addEventListener('click', async function () {
-            try {
-                // Get the key from the data attribute of the button (assuming gameName is stored as a data attribute)
-                const keyToSearch = searchButton.dataset.gameName;
-                console.log(keyToSearch);
-
-                // Make a request to the /search endpoint with the entered key
-                const response = await fetch(`/search?key=${keyToSearch}`);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                // Parse the JSON response
-                const searchData = await response.json();
-
-                // Encode the JSON data as a URI component
-                const encodedData = encodeURIComponent(JSON.stringify(searchData));
-
-                // Construct the URL for the game.html page with the JSON data as a query parameter
-                const gameUrl = `/game.html?data=${encodedData}`;
-
-                // Navigate to the game.html page
-                window.location.href = gameUrl;
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error fetching or navigating to the game page. See console for details.');
-            }
-        });
-    });
-}
-
-
-        // Event listener for search button
         document.querySelector('.btn-primary').addEventListener('click', searchGames);
 
-        // Event listener for pressing 'Enter' in the search field
         document.querySelector('#titleSearch').addEventListener('keypress', function (event) {
             if (event.key === 'Enter') {
                 searchGames();
@@ -346,47 +303,6 @@ function addEventListenersToButtons() {
             populateFilters();
             updateAccountSection();
         };
-
-
-        
-        setTimeout(async function () {
-// Get all elements with the class "resultsbutton"
-const searchButtons = document.querySelectorAll('.resultsbutton');
-
-// Add a click event listener to each button
-searchButtons.forEach(searchButton => {
-    searchButton.addEventListener('click', async function () {
-        try {
-            // Get the key from the data attribute of the button (assuming gameName is stored as a data attribute)
-            const keyToSearch = searchButton.dataset.gameName;
-            console.log(keyToSearch);
-
-            // Make a request to the /search endpoint with the entered key
-            const response = await fetch(`/search?key=${keyToSearch}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            // Parse the JSON response
-            const searchData = await response.json();
-
-            // Encode the JSON data as a URI component
-            const encodedData = encodeURIComponent(JSON.stringify(searchData));
-
-            // Construct the URL for the game.html page with the JSON data as a query parameter
-            const gameUrl = `/game.html?data=${encodedData}`;
-
-            // Navigate to the game.html page
-            window.location.href = gameUrl;
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error fetching or navigating to the game page. See console for details.');
-        }
-    });
-});
-
-}, 1000); // Adjust the delay time as needed
     </script>
 
     <footer>
