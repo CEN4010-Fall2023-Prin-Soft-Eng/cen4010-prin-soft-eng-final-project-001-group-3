@@ -1,7 +1,8 @@
 class Review {
-    constructor(username, text) {
+    constructor(username, text, positive) {
         this.username = username;
         this.text = text;
+        this.positive = positive;
         this.positiveVotes = 0;
         this.negativeVotes = 0;
         this.voters = {};

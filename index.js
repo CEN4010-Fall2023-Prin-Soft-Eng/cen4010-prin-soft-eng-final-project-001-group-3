@@ -327,6 +327,10 @@ app.get('/user/reviews/:username', verifyToken, async (req, res) => {
  *         name: reviewText
  *         required: true
  *         description: The text of the review.
+ *       - in: formData
+ *         name: positive
+ *         required: true
+ *         description: Whether the review is positive or negative.
  *     responses:
  *       201:
  *         description: Review added successfully
@@ -338,7 +342,7 @@ app.get('/user/reviews/:username', verifyToken, async (req, res) => {
 app.post('/review/:gameId', verifyToken, async (req, res) => {
     try {
         const { gameId } = req.params;
-        const { reviewText } = req.body;
+        const { reviewText, positive } = req.body;
         const { username } = req.user;
         const game = await Game.find(gameId);
 
@@ -346,7 +350,7 @@ app.post('/review/:gameId', verifyToken, async (req, res) => {
             return res.status(404).json({ message: 'Game not found' });
         }
 
-        const errorMessage = game.addReview(username, reviewText);
+        const errorMessage = game.addReview(username, reviewText, positive);
 
         if (errorMessage) {
             return res.status(403).json({ message: errorMessage });
@@ -388,6 +392,29 @@ app.post('/review/:gameId', verifyToken, async (req, res) => {
  *         description: Internal Server Error
  */
 app.put('/review/:gameId', verifyToken, async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const { reviewText } = req.body;
+        const { username } = req.user;
+        const game = await Game.find(gameId);
+
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        const errorMessage = game.editReview(username, reviewText);
+
+        if (errorMessage) {
+            return res.status(403).json({ message: errorMessage });
+        }
+
+        await game.save();
+
+        res.status(201).json({ message: 'Review edited successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
 /**
@@ -411,6 +438,28 @@ app.put('/review/:gameId', verifyToken, async (req, res) => {
  *         description: Internal Server Error
  */
 app.delete('/review/:gameId', verifyToken, async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const { username } = req.user;
+        const game = await Game.find(gameId);
+
+        if (!game) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        const errorMessage = game.deleteReview(username);
+
+        if (errorMessage) {
+            return res.status(403).json({ message: errorMessage });
+        }
+
+        await game.save();
+
+        res.status(201).json({ message: 'Review deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
 /**

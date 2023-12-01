@@ -18,6 +18,8 @@
             <div class="col-lg-8 col-md-6">
                 <h2>Game Details</h2>
                 <p><strong>Title:</strong> <span id="gameTitle"></span></p>
+                <p>👍 <span id="positiveVotesCounter"></span></p>
+                <p>👎 <span id="negativeVotesCounter"></span></p>
             </div>
         </div>
         <div class="row mt-3">
@@ -34,6 +36,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('gameId');
         const token = localStorage.getItem('token');
+        const currentUser = localStorage.getItem('currentUser');
 
         async function upvoteReview(reviewId) {
             const response = await fetch(`/upvote/${gameId}/${reviewId}`, {
@@ -77,6 +80,52 @@
             alert(jsonData.message);
         }
 
+        function editReview(index) {
+            const reviewTextElement = document.getElementById(`reviewText${index}`);
+            const originalText = reviewTextElement.innerText;
+
+            reviewTextElement.innerHTML = `
+                <input type="text" id="editInput${index}" value="${originalText}">
+                <button class="btn btn-success" onclick="saveEditedReview(${index})">Save</button>
+            `;
+        }
+
+        async function saveEditedReview(index) {
+            const editedText = document.getElementById(`editInput${index}`).value;
+
+            const response = await fetch(`/review/${gameId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ reviewText: editedText }),
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            document.getElementById(`reviewText${index}`).innerText = editedText;
+        }
+
+        async function deleteReview(index) {
+            if (!confirm("Are you sure you want to delete this review?")) {
+                return;
+            }
+
+            const response = await fetch(`/review/${gameId}`, {
+                method: 'DELETE',
+                body: JSON.stringify({ reviewId: index }),
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            const reviewElement = document.getElementById(`reviewItem${index}`);
+            if (reviewElement) {
+                reviewElement.remove();
+            }
+        }
+
+
         document.addEventListener("DOMContentLoaded", async function () {
             const response = await fetch(`/game/${gameId}`, {
                 method: 'GET',
@@ -93,19 +142,46 @@
             const reviewsList = document.getElementById("reviewsList");
 
             let counter = 0;
+            let positiveVotes = 0;
+            let negativeVotes = 0;
 
             jsonData.reviews.forEach((review) => {
                 const li = document.createElement("li");
+                li.id = `reviewItem${counter}`;
                 li.classList.add("list-group-item");
+
+                let editButtonHTML = '';
+                let deleteButtonHTML = '';
+                if (review.username === currentUser) {
+                    editButtonHTML = `<button id="edit${counter}" class="btn btn-secondary" onclick="editReview(${counter})">Edit</button>`;
+                    deleteButtonHTML = `<button id="delete${counter}" class="btn btn-danger" onclick="deleteReview(${counter})">Delete</button>`;
+                }
+
+                let emoji = review.positive ? "👍" : "👎";
+
+                if (review.positive) {
+                    positiveVotes += 1;
+                } else {
+                    negativeVotes += 1;
+                }
+
                 li.innerHTML = `
-                <img src="${review.profilePicture}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
-                <strong><a href="profile.html?username=${review.username}">${review.username}</strong></a>: ${review.text}
-                <button id="upvote${counter}" class="btn thumbs-up" onclick="upvoteReview(${counter})"> 👍 ${review.positiveVotes} </button>
-                <button id="downvote${counter}" class="btn thumbs-down" onclick="downvoteReview(${counter})"> 👎 ${review.negativeVotes} </button>
-            `;
+                    <img src="${review.profilePicture}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <strong><a href="profile.html?username=${review.username}">${review.username} ${emoji}</strong></a>: <span id="reviewText${counter}">${review.text}</span>
+                    <button id="upvote${counter}" class="btn positive-icon" onclick="upvoteReview(${counter})"> 🔼 ${review.positiveVotes} </button>
+                    <button id="downvote${counter}" class="btn negative-icon" onclick="downvoteReview(${counter})"> 🔽 ${review.negativeVotes} </button>
+                    ${editButtonHTML}
+                    ${deleteButtonHTML}
+                `;
                 counter++;
                 reviewsList.appendChild(li);
             });
+
+            const positiveVotesCounter = document.getElementById("positiveVotesCounter");
+            const negativeVotesCounter = document.getElementById("negativeVotesCounter");
+
+            positiveVotesCounter.textContent = positiveVotes;
+            negativeVotesCounter.textContent = negativeVotes;
         });
     </script>
 </body>

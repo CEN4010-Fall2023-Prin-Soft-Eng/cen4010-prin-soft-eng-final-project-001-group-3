@@ -33,8 +33,8 @@ header h1 a:hover {
     color: #007bff;
 }
 
-.thumbs-up,
-.thumbs-down {
+.positive-icon,
+.negative-icon {
     position: absolute;
     background-color: transparent;
     border: none;
@@ -42,12 +42,12 @@ header h1 a:hover {
     font-size: 26px;
 }
 
-.thumbs-up {
+.positive-icon {
     top: 5px;
     right: 70px;
 }
 
-.thumbs-down {
+.negative-icon {
     top: 5px;
     right: 2px;
 }

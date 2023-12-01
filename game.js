@@ -16,14 +16,37 @@ class Game {
         this.reviewers = reviewers;
     }
 
-    addReview(username, text) {
+    addReview(username, text, positive) {
         if (this.reviewers.includes(username)) {
             return 'You have already added a review';
         }
 
-        this.reviews.push(new Review(username, text));
+        this.reviews.push(new Review(username, text, positive));
         this.reviewers.push(username);
 
+        return null;
+    }
+
+    editReview(username, text) {
+        const review = this.reviews.find(review => review.username === username);
+
+        if (!review) {
+            return 'You have not added a review';
+        }
+
+        review.text = text;
+        return null;
+    }
+
+    deleteReview(username) {
+        const index = this.reviews.findIndex(review => review.username === username);
+
+        if (index === -1) {
+            return 'You have not added a review';
+        }
+
+        this.reviews.splice(index, 1);
+        this.reviewers.splice(index, 1);
         return null;
     }
 
