@@ -4,15 +4,23 @@
     border: 1px solid #ccc;
     background-size: contain;
     background-position: center;
-    color: black;
+    color: ghostwhite;
     height: 200px;
     background-repeat: no-repeat;
     position: relative;
+    background-color: #121212;
+    width: 50%;
+    position: relative;
+    left:25%;
+    margin-top: 40px;
 }
 
 body {
     position: relative;
     padding-top: 65px;
+    background-color: #0A0A0A;
+    font-size: 24pt;
+    font-style: bold;
 }
 
 .top-bar {
@@ -34,8 +42,8 @@ body {
     width: 10%;
 }
 
-header {
-    margin-top: 80px;
+.top-bar{
+    color:ghostwhite;
 }
 
 #data-container {
@@ -59,4 +67,63 @@ header {
 .negative-icon {
     top: 10px;
     right: 20px;
+}
+.btn-primary{
+    background-color: #15292B;
+    border-color: ghostwhite;
+}
+.nav-link{
+    color:ghostwhite;
+}
+#pagination{
+    position:absolute;
+    left:43%;
+    font-size: 12pt;
+}
+#currentPage{
+    color:ghostwhite;
+}
+#titleSearch{
+    background-color: #15292B;
+    color: ghostwhite;
+    
+}
+#titleSearch::placeholder{
+    color:ghostwhite;
+}
+#genreFilter{
+    background-color: #15292B;
+    color: ghostwhite;
+}
+#platformFilter{
+    background-color: #15292B;
+    color: ghostwhite;
+}
+#tagFilter{
+    background-color: #15292B;
+    color: ghostwhite;
+}
+.mt-4{
+    position: absolute;
+    left:20%;
+    top:20%;
+}
+.btn-primary:hover{
+    background-color: #0A0A0A;
+}
+.modal-content{
+    background-color: #121212;
+    color: ghostwhite;
+}
+.form-control{
+    background-color: #15292B;
+}
+button.close{
+    color: ghostwhite;
+}
+button.close:hover{
+    color: white;
+}
+#reviewModal{
+    margin-top: 10%;
 }

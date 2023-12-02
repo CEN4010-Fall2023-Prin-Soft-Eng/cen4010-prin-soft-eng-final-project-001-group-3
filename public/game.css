@@ -1,7 +1,7 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #0A0A0A;
+    color: ghostwhite;
 }
 
 header h1 a {
@@ -15,7 +15,7 @@ header h1 a:hover {
 }
 
 .container {
-    background-color: white;
+    background-color:  #121212;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -23,10 +23,11 @@ header h1 a:hover {
 
 .list-group-item {
     transition: background-color 0.3s ease;
+    background-color: #0A0A0A;
 }
 
 .list-group-item:hover {
-    background-color: #f8f9fa;
+    background-color: #15292B;
 }
 
 .review-title {
@@ -50,4 +51,7 @@ header h1 a:hover {
 .negative-icon {
     top: 5px;
     right: 2px;
+}
+#homelink{
+    color: whitesmoke;
 }
