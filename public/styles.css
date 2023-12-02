@@ -74,6 +74,11 @@ body {
 }
 .nav-link{
     color:ghostwhite;
+    opacity: 80%;
+}
+.nav-link:hover{
+    opacity: 100%;
+    color:ghostwhite;
 }
 #pagination{
     position:absolute;
@@ -126,4 +131,15 @@ button.close:hover{
 }
 #reviewModal{
     margin-top: 10%;
+}
+.Homelink a:hover{
+    opacity: 100%;
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    
+}
+.Homelink a{
+    opacity: 80%;
+    color:ghostwhite;
+    font-family: 'Arial', sans-serif;
 }

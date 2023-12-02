@@ -52,6 +52,13 @@ header h1 a:hover {
     top: 5px;
     right: 2px;
 }
-#homelink{
-    color: whitesmoke;
+.Homelink a:hover{
+    opacity: 100%;
+    text-decoration: none;
+    
+}
+.Homelink a{
+    opacity: 80%;
+    color:ghostwhite;
+    font-size:32px;
 }

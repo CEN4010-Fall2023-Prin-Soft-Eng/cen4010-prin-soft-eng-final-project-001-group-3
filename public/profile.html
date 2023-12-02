@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRP 3 Game Reviews - User Profile</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="profile.css">
 
     <style>
         header {
@@ -13,11 +14,14 @@
     </style>
 </head>
 
-<body style="background-color: #0A0A0A;">
-    <header>
-        <h1 class="text-center" style="color:ghostwhite;">Game Reviewer</h1>
-    </header>
-
+<body>
+    <div class="Homelink">
+        <header><a href="homepage.html" >
+            <img src="gameReviewerLogo.png" style="vertical-align: middle; margin-bottom: 43px; margin-left: 0px;">
+            Game Reviewer
+        </a></header>
+        </div>
+    
     <form id="profileUpdateForm" class="container mt-4">
         <div class="row" style="color:ghostwhite;">
             <div class="col-md-6">
@@ -40,7 +44,7 @@
 
     <div class="container mt-4">
         <a href="reviews.html">
-            <button class="btn btn-primary mt-3" type="button">See My Reviews</button>
+            <button class="btn btn-primary mt-3" type="button" id="seereviewsBTN">See My Reviews</button>
         </a>
     </div>
 
