@@ -170,7 +170,7 @@
 
                 li.innerHTML = `
                     <img src="${review.profilePicture}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
-                    <strong><a href="profile.html?username=${review.username}">${review.username} ${emoji}</strong></a>: <span id="reviewText${counter}">${review.text}</span>
+                    <strong><a href="reviews.html?user=${review.username}">${review.username}</strong></a> ${emoji}: <span id="reviewText${counter}">${review.text}</span>
                     <button id="upvote${counter}" class="btn positive-icon" onclick="upvoteReview(${counter})"> 🔼 ${review.positiveVotes} </button>
                     <button id="downvote${counter}" class="btn negative-icon" onclick="downvoteReview(${counter})"> 🔽 ${review.negativeVotes} </button>
                     ${editButtonHTML}
