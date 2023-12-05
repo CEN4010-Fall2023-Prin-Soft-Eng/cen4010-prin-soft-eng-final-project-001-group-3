@@ -11,11 +11,11 @@
 
 <body>
     <div class="Homelink">
-        <header><a href="index.html" >
-            <img src="gameReviewerLogo.png" style="vertical-align: middle; margin-bottom: 43px; margin-left: 15px;">
-            Game Reviewer
-        </a></header>
-        </div>
+        <header><a href="index.html">
+                <img src="gameReviewerLogo.png" style="vertical-align: middle; margin-bottom: 43px; margin-left: 15px;">
+                Game Reviewer
+            </a></header>
+    </div>
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-md-6">
@@ -55,8 +55,8 @@
                 const upvoteButton = document.getElementById(`upvote${reviewId}`);
                 const downvoteButton = document.getElementById(`downvote${reviewId}`);
 
-                upvoteButton.innerHTML = `👍 ${jsonData.positiveVotes}`;
-                downvoteButton.innerHTML = `👎 ${jsonData.negativeVotes}`;
+                upvoteButton.innerHTML = `🔼 ${jsonData.positiveVotes}`;
+                downvoteButton.innerHTML = `🔽 ${jsonData.negativeVotes}`;
             }
 
             alert(jsonData.message);
@@ -76,8 +76,8 @@
                 const upvoteButton = document.getElementById(`upvote${reviewId}`);
                 const downvoteButton = document.getElementById(`downvote${reviewId}`);
 
-                upvoteButton.innerHTML = `👍 ${jsonData.positiveVotes}`;
-                downvoteButton.innerHTML = `👎 ${jsonData.negativeVotes}`;
+                upvoteButton.innerHTML = `🔼 ${jsonData.positiveVotes}`;
+                downvoteButton.innerHTML = `🔽 ${jsonData.negativeVotes}`;
             }
 
             alert(jsonData.message);
