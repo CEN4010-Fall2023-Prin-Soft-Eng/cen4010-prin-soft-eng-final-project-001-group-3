@@ -60,5 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('profilePictureDisplay').src = result.profilePicture;
     }
 
+    document.getElementById('seeReviewsLink').href = '/reviews.html?user=' + localStorage.getItem('currentUser');
+
     loadProfileData();
 });
