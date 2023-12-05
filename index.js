@@ -307,11 +307,58 @@ app.get('/profile-data', verifyToken, async (req, res) => {
  *     responses:
  *       200:
  *         description: Reviews retrieved successfully
+ *       404:
+ *         description: No reviews found for the specified username
  *       500:
  *         description: Internal Server Error
  */
 app.get('/user/reviews/:username', verifyToken, async (req, res) => {
+    try {
+        const username = req.params.username;
+        const gamesFolderPath = path.join(__dirname, 'games');
+
+        // Get a list of all files in the "games" folder
+        const gameFiles = fs.readdirSync(gamesFolderPath);
+
+        // Array to store matching reviews with game name
+        let matchingReviews = [];
+
+        // Loop through each file to find reviews with the matching username
+        for (const file of gameFiles) {
+            const filePath = path.join(gamesFolderPath, file);
+
+            // Read the content of the JSON file
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+
+            // Parse the JSON content
+            const gameData = JSON.parse(fileContent);
+
+            // Check if the username exists in the reviewers array of any review
+            const userReviews = gameData.reviews.filter(review => review.username === username);
+
+            if (userReviews.length > 0) {
+                // Add the matching reviews with game name and ID to the result array
+                matchingReviews = matchingReviews.concat({
+                    id: gameData.id,
+                    title: gameData.title, // Update to use the 'title' property
+                    reviews: userReviews,
+                });
+            }
+        }
+
+        if (matchingReviews.length > 0) {
+            // Send the matching reviews with game name and ID as a response
+            res.status(200).json(matchingReviews);
+        } else {
+            // If no match is found, return a 404 response
+            res.status(404).json({ error: 'No reviews found for the specified username' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
+
 
 /**
  * @swagger

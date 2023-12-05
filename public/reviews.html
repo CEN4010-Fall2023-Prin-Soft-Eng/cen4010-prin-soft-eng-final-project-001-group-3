@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Reviews</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="reviews.css">
+</head>
+<body>
+    <div class="Homelink">
+        <header><a href="homepage.html" >
+            <img src="gameReviewerLogo.png" style="vertical-align: middle; margin-bottom: 43px; margin-left: 0px;">
+            Game Reviewer
+        </a></header>
+        </div>
+<h1>My Reviews</h1>
+<div id="reviews-container"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Retrieve the username and token from local storage
+        const username = localStorage.getItem('currentUser');
+        const token = localStorage.getItem('token');
+        let index='0';
+        // Make sure both username and token are available
+        if (!username || !token) {
+            console.error('Username or token not found in local storage');
+            return;
+        }
+        // Make a GET request to the /user/reviews/:username endpoint
+        fetch(`/user/reviews/${username}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include the Bearer token for authentication
+                'Authorization': `${token}`
+            },
+        })
+        
+        .then(response => response.json())
+        
+        .then(data => {
+            // Assuming the JSON data includes game name and reviews array
+            const reviewsContainer = document.getElementById('reviews-container');
+            // Iterate over each entry in the data array
+            data.forEach(entry => {
+                
+                // Create a div element for each game and its reviews
+                const gameDiv = document.createElement('div');
+                gameDiv.className = 'card my-3'; // Bootstrap card class and margin class
+                gameDiv.id=index;
+    
+                // Create a header for the game name
+                const header = document.createElement('h5');
+                header.className = 'card-header'; // Bootstrap card header class
+                header.innerText = entry.title; // Update to use the 'title' property
+                //const gameId=entry.id;
+                
+    
+                // Append the header to the game div
+                gameDiv.appendChild(header);
+                // Iterate over each review in the reviews array
+                entry.reviews.forEach((review, index) => {
+                    
+                    // Create a div element for each review
+                    const reviewDiv = document.createElement('div');
+                    
+                    reviewDiv.className = 'card-body'; // Bootstrap card body class
+                   // Iterate over the keys and values of each review
+for (const [key, value] of Object.entries(review)) {
+    // Create a paragraph element for each key-value pair
+    const paragraph = document.createElement('p');
+    paragraph.className = 'card-text'; // Bootstrap card text class
+    paragraph.id = index;
+
+    if (value === true) {
+        paragraph.innerHTML = `<strong>Positive review</strong>: 👍`;
+    } else if (value === false) {
+        paragraph.innerHTML = `<strong>Negative review</strong>: 👎`;
+    } else if (key === 'voters') {
+        // Display voters separately
+        paragraph.innerHTML = `<strong>Voters</strong>: `;
+        for (const [voter, vote] of Object.entries(value)) {
+            paragraph.innerHTML += `| ${voter}: ${vote} |`;
+        }
+    } else {
+        paragraph.innerHTML = `<strong>${key}:</strong> ${value} `;
+    }
+
+    // Append the paragraph to the review div
+    reviewDiv.appendChild(paragraph);
+}
+
+                    // Add edit button and text box
+                    const editButton = document.createElement('button');
+                    editButton.className = 'btn btn-secondary';
+                    editButton.id ='editButton-'+entry.id;
+                    editButton.innerText = 'Edit';
+                    editButton.onclick = () => openEditBox(index, review.text, entry.id,token); // Pass the game ID to the function
+                    reviewDiv.appendChild(editButton);
+    
+                    const editTextBox = document.createElement('textarea');
+                    editTextBox.style.display = 'none';
+                    editTextBox.id = `editBox-${entry.id}-${index}`; // Use unique identifiers
+                    reviewDiv.appendChild(editTextBox);
+    
+                    const saveButton = document.createElement('button');
+                    saveButton.className = 'btn btn-success';
+                    saveButton.innerText = 'Save';
+                    saveButton.style.display = 'none';
+                    saveButton.id='saveButton-'+entry.id;
+                    saveButton.onclick = () => saveEditedReview(index, entry.id, token); // Pass the game ID to the function
+                    reviewDiv.appendChild(saveButton);
+    
+                    // Add a line break between each review
+                    reviewDiv.appendChild(document.createElement('hr'));
+    
+                    // Append the review div to the game div
+                    gameDiv.appendChild(reviewDiv);
+                });
+    
+                // Append the game div to the reviews container
+                reviewsContainer.appendChild(gameDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching reviews:', error);
+            // Handle errors or display a message to the user
+        });
+    });
+    
+    function openEditBox(index, currentText, gameId,token) {
+        const editTextBox = document.getElementById(`editBox-${gameId}-${index}`);
+        const saveButton = document.getElementById(`saveButton-${gameId}`);
+        editTextBox.value = currentText;
+        editTextBox.style.display = 'block';
+        saveButton.style.display = 'block';
+    }
+    
+    async function saveEditedReview(index, gameId, token) {
+    try {
+        const editedText = document.getElementById(`editBox-${gameId}-${index}`).value;
+
+        const response = await fetch(`/review/${gameId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ reviewText: editedText }),
+            headers: {
+                'Authorization': token ,
+                'Content-Type': 'application/json'
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        document.getElementById(`editBox-${gameId}-${index}`).style.display = 'none';
+        //document.querySelector(`button[data-index="${index}"]`).style.display = 'none';
+    } catch (error) {
+        console.error('Error saving edited review:', error);
+    }
+    location.reload();
+}
+
+    </script>
+    
+    
+    
+
+</body>
+</html>
