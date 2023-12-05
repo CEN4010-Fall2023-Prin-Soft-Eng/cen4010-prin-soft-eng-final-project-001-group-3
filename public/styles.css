@@ -11,8 +11,13 @@
     background-color: #121212;
     width: 50%;
     position: relative;
-    left:25%;
+    left: 25%;
     margin-top: 40px;
+}
+
+.game-title {
+    width: 33%;
+    word-wrap: break-word;
 }
 
 body {
@@ -42,8 +47,8 @@ body {
     width: 10%;
 }
 
-.top-bar{
-    color:ghostwhite;
+.top-bar {
+    color: ghostwhite;
 }
 
 #data-container {
@@ -68,78 +73,97 @@ body {
     top: 10px;
     right: 20px;
 }
-.btn-primary{
+
+.btn-primary {
     background-color: #15292B;
     border-color: ghostwhite;
 }
-.nav-link{
-    color:ghostwhite;
+
+.nav-link {
+    color: ghostwhite;
     opacity: 80%;
 }
-.nav-link:hover{
+
+.nav-link:hover {
     opacity: 100%;
-    color:ghostwhite;
+    color: ghostwhite;
 }
-#pagination{
-    position:absolute;
-    left:43%;
+
+#pagination {
+    position: absolute;
+    left: 43%;
     font-size: 12pt;
 }
-#currentPage{
-    color:ghostwhite;
-}
-#titleSearch{
-    background-color: #15292B;
-    color: ghostwhite;
-    
-}
-#titleSearch::placeholder{
-    color:ghostwhite;
-}
-#genreFilter{
-    background-color: #15292B;
+
+#currentPage {
     color: ghostwhite;
 }
-#platformFilter{
+
+#titleSearch {
     background-color: #15292B;
     color: ghostwhite;
+
 }
-#tagFilter{
+
+#titleSearch::placeholder {
+    color: ghostwhite;
+}
+
+#genreFilter {
     background-color: #15292B;
     color: ghostwhite;
 }
-.mt-4{
+
+#platformFilter {
+    background-color: #15292B;
+    color: ghostwhite;
+}
+
+#tagFilter {
+    background-color: #15292B;
+    color: ghostwhite;
+}
+
+.mt-4 {
     position: absolute;
-    left:20%;
-    top:20%;
+    left: 20%;
+    top: 20%;
 }
-.btn-primary:hover{
+
+.btn-primary:hover {
     background-color: #0A0A0A;
 }
-.modal-content{
+
+.modal-content {
     background-color: #121212;
     color: ghostwhite;
 }
-.form-control{
+
+.form-control {
     background-color: #15292B;
 }
-button.close{
+
+button.close {
     color: ghostwhite;
 }
-button.close:hover{
+
+button.close:hover {
     color: white;
 }
-#reviewModal{
+
+#reviewModal {
     margin-top: 10%;
 }
-.Homelink a:hover{
+
+.Homelink a:hover {
     opacity: 100%;
     text-decoration: none;
     font-family: 'Arial', sans-serif;
-    
+
 }
-.Homelink a{
+
+.Homelink a {
     opacity: 80%;
-    color:ghostwhite;
+    color: ghostwhite;
     font-family: 'Arial', sans-serif;
 }

@@ -127,7 +127,7 @@
 
                         return `
                             <div class="game-container" style="background-image: url(${backgroundImage})">
-                                <p>${game.name}</p>
+                                <p class="game-title">${game.name}</p>
                                 <a href="game.html?gameId=${game.id}"><button class="btn btn-primary">Show all Reviews</button></a>
                                 <button class="btn positive-icon" onclick="openReviewModal(${game.id}, '${gameName}', true)"> 👍 </button>
                                 <button class="btn negative-icon" onclick="openReviewModal(${game.id}, '${gameName}', false)"> 👎 </button>
