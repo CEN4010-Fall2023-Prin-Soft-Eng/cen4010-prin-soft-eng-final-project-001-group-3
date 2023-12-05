@@ -11,7 +11,7 @@
 
 <body>
     <div class="Homelink">
-        <header><a href="homepage.html" >
+        <header><a href="index.html" >
             <img src="gameReviewerLogo.png" style="vertical-align: middle; margin-bottom: 43px; margin-left: 0px;">
             Game Reviewer
         </a></header>
@@ -27,7 +27,7 @@
         </form>
         <div class="links">
             <p>Don't Have an account?  <a href="CreateAccount.html">Create Account</a></p>
-            <p><a href="homepage.html">Return to Homepage</a></p>
+            <p><a href="index.html">Return to Homepage</a></p>
         </div>
     </div>
     
@@ -53,7 +53,7 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('currentUser', username);
-                    window.location.href = '/homepage.html';
+                    window.location.href = '/index.html';
                 } else {
                     alert(data.message);
                 }
