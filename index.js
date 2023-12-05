@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
@@ -58,18 +58,20 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('./public'));
 app.use("/uploads", express.static('uploads'));
 
+{
+    const fs = require('fs');
 
+    if (!fs.existsSync('accounts')) {
+        fs.mkdirSync('accounts');
+    }
 
-if (!fs.existsSync('accounts')) {
-    fs.mkdirSync('accounts');
-}
+    if (!fs.existsSync('uploads')) {
+        fs.mkdirSync('uploads');
+    }
 
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
-
-if (!fs.existsSync('games')) {
-    fs.mkdirSync('games');
+    if (!fs.existsSync('games')) {
+        fs.mkdirSync('games');
+    }
 }
 
 const DEFAULT_PICTURE = "https://e7.pngegg.com/pngimages/753/432/png-clipart-user-profile-2018-in-sight-user-conference-expo-business-default-business-angle-service-thumbnail.png";
@@ -229,35 +231,27 @@ const upload = multer({
  *       500:
  *         description: Internal Server Error
  */
-app.post('/save-profile', verifyToken, upload.single('profilePicture'), (req, res) => {
+app.post('/save-profile', verifyToken, upload.single('profilePicture'), async (req, res) => {
     const { username } = req.user;
     const description = req.body.description;
     const picturePath = req.file ? req.file.path : null;
+    const userProfilePath = `accounts/${username}.json`;
 
-    const userProfilePath = `accounts/${username}.json`;  // Path to the user's JSON file
-
-    // Read the existing user profile
-    fs.readFile(userProfilePath, (error, data) => {
-        if (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'Error reading profile file' });
-        }
-
-        let userProfile = JSON.parse(data.toString());
+    try {
+        const data = await fs.readFile(userProfilePath);
+        const userProfile = JSON.parse(data.toString());
 
         // Update only the relevant fields
         if (description) userProfile.description = description;
         if (picturePath) userProfile.profilePicture = picturePath;
 
-        // Write the updated data back to the JSON file
-        fs.writeFile(userProfilePath, JSON.stringify(userProfile, null, 2), err => {
-            if (error) {
-                console.error(error);
-                return res.status(500).json({ message: 'Error writing to file' });
-            }
-            res.status(201).json({ message: 'Profile updated successfully' });
-        });
-    });
+        await fs.writeFile(userProfilePath, JSON.stringify(userProfile, null, 2));
+
+        res.status(201).json({ message: 'Profile updated successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
 
 /**
@@ -315,42 +309,26 @@ app.get('/profile-data', verifyToken, async (req, res) => {
 app.get('/user/reviews/:username', verifyToken, async (req, res) => {
     try {
         const username = req.params.username;
-        const gamesFolderPath = path.join(__dirname, 'games');
+        const gameFiles = await fs.readdir('games');
+        const matchingReviews = [];
 
-        // Get a list of all files in the "games" folder
-        const gameFiles = fs.readdirSync(gamesFolderPath);
-
-        // Array to store matching reviews with game name
-        let matchingReviews = [];
-
-        // Loop through each file to find reviews with the matching username
         for (const file of gameFiles) {
-            const filePath = path.join(gamesFolderPath, file);
-
-            // Read the content of the JSON file
-            const fileContent = fs.readFileSync(filePath, 'utf8');
-
-            // Parse the JSON content
+            const fileContent = await fs.readFile(`games/${file}`, 'utf8');
             const gameData = JSON.parse(fileContent);
-
-            // Check if the username exists in the reviewers array of any review
             const userReviews = gameData.reviews.filter(review => review.username === username);
 
             if (userReviews.length > 0) {
-                // Add the matching reviews with game name and ID to the result array
-                matchingReviews = matchingReviews.concat({
+                matchingReviews.push({
                     id: gameData.id,
-                    title: gameData.title, // Update to use the 'title' property
-                    reviews: userReviews,
+                    title: gameData.title,
+                    review: userReviews[0],
                 });
             }
         }
 
         if (matchingReviews.length > 0) {
-            // Send the matching reviews with game name and ID as a response
             res.status(200).json(matchingReviews);
         } else {
-            // If no match is found, return a 404 response
             res.status(404).json({ error: 'No reviews found for the specified username' });
         }
     } catch (error) {
