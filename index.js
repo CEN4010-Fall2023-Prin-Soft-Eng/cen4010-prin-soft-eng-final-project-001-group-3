@@ -180,7 +180,7 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ username }, secretKey, { expiresIn: '1d' });
+        const token = jwt.sign({ username }, secretKey, { expiresIn: '365d' });
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
