@@ -6,7 +6,7 @@ As of now, test html pages with live server extension.
 
 Team Members:
 
-Angi Demascio - Account / Sign in / Review functionality, Upvotes / Downvotes UI & functionality, Search bar UI & functionality, Profile UI & functionality
+Angi Demascio - Swagger documentation, Create Account / Sign In / Log Out functionality, Review UI & functionality, Upvotes / Downvotes UI & functionality, Search bar UI & functionality, Profile UI & functionality + Update Homepage UI upon login, Game page functionality, Navbar UI and functionality
 
 James Yackanich -create basic reviews page/create basic home page/RECOMMENDED GAMES/Add review option for each game/added matching css styles for all pages.
 
