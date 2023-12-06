@@ -115,7 +115,7 @@ async function searchAndDisplayGamesData() {
     const tag = document.getElementById('tagFilter').value;
     const data = await fetchData(searchQuery, platform, genre, tag, getPageIndex());
 
-    displayGamesData(data.results);
+    displayGamesData(data?.results);
 }
 
 async function setPageIndex(page) {
