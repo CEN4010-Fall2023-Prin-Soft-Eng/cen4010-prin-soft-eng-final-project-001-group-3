@@ -97,8 +97,8 @@ function displayGamesData(results) {
 
         card.querySelector('a').href = `/game.html?id=${data.id}`;
         card.querySelector('.card-title').textContent = data.name;
-        card.querySelector('.positive-icon').onclick = () => openReviewModal(data.id, data.name, true);
-        card.querySelector('.negative-icon').onclick = () => openReviewModal(data.id, data.name, false);
+        card.querySelector('.positive-icon').addEventListener('click', () => openReviewModal(data.id, data.name, true));
+        card.querySelector('.negative-icon').addEventListener('click', () => openReviewModal(data.id, data.name, false));
 
         cardList.appendChild(card);
     }
@@ -209,35 +209,33 @@ async function updateAccountSection() {
     }
 }
 
-document.getElementById('logOutButton').onclick = () => {
+document.getElementById('logOutButton').addEventListener('click', function () {
     localStorage.removeItem('token');
-    window.location.reload();
-};
+    window.location.href = '/index.html';
+});
 
-document.getElementById('searchButton').onclick = async () => {
+document.getElementById('searchButton').addEventListener('click', async () => {
     await setPageIndex(1);
-};
+});
 
-document.getElementById('searchBar').onkeydown = async (event) => {
+document.getElementById('searchBar').addEventListener('keydown', async (event) => {
     if (event.key === 'Enter') {
         await setPageIndex(1);
     }
-};
-
-document.getElementById('nextPage').onclick = async () => {
-    await setPageIndex(getPageIndex() + 1);
-};
-
-document.getElementById('previousPage').onclick = async () => {
-    await setPageIndex(getPageIndex() - 1);
-};
-
-document.getElementById('modalSubmit').onclick = async () => {
-    await submitReview();
-};
-
-document.addEventListener('DOMContentLoaded', async () => {
-    setPageIndex(1);
-    populateFilters();
-    updateAccountSection();
 });
+
+document.getElementById('nextPage').addEventListener('click', async () => {
+    await setPageIndex(getPageIndex() + 1);
+});
+
+document.getElementById('previousPage').addEventListener('click', async () => {
+    await setPageIndex(getPageIndex() - 1);
+});
+
+document.getElementById('modalSubmit').addEventListener('click', async () => {
+    await submitReview();
+});
+
+setPageIndex(1);
+populateFilters();
+updateAccountSection();
