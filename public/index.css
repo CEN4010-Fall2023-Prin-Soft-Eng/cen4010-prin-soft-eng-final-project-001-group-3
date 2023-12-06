@@ -1,0 +1,16 @@
+.website-logo {
+    width: 40px;
+    height: 40px;
+}
+
+.profile-picture {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.positive-icon,
+.negative-icon {
+    cursor: pointer;
+    font-size: 24px;
+}
