@@ -12,6 +12,9 @@
 
 ## Our goal
   The goal of our project was to create an interactive platform that allows people to view and create their own reviews for games. With these reviews, people could discover new games they may be interested in.
+  
+## Link to site
+https://gamereviewer.onrender.com 
 
 ## How to test our project locally on your machine?
 1.First download all code and files from the repossitory.
