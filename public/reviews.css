@@ -1,32 +1,37 @@
-.Homelink a:hover{
+.Homelink a:hover {
     opacity: 100%;
     text-decoration: none;
-    color:ghostwhite;
-    
+    color: ghostwhite;
+
 }
-.Homelink a{
+
+.Homelink a {
     opacity: 80%;
-    color:ghostwhite;
-    font-size:32px;
+    color: ghostwhite;
+    font-size: 32px;
     text-decoration: none;
 }
-body{
+
+body {
     background-color: #0A0A0A;
-    color:ghostwhite;
+    color: ghostwhite;
 }
-.card{
-    width:50%;
+
+.card {
+    width: 50%;
     margin-left: 25%;
     background-color: #121212;
     font-size: 13pt;
 }
-h1{
+
+h1 {
     text-align: center;
-    color:ghostwhite;
+    color: ghostwhite;
 }
-h5{
+
+h5 {
     text-align: center;
-    color:ghostwhite;
+    color: ghostwhite;
     font-weight: bolder;
     font-size: 24pt;
 }

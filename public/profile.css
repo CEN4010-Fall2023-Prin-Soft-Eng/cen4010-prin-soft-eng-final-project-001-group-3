@@ -1,36 +1,43 @@
-.Homelink a:hover{
+.Homelink a:hover {
     opacity: 100%;
     text-decoration: none;
     font-family: 'Arial', sans-serif;
-    
+
 }
-.Homelink a{
+
+.Homelink a {
     opacity: 80%;
-    color:ghostwhite;
-    font-size:32px;
+    color: ghostwhite;
+    font-size: 32px;
     text-decoration: none;
     font-family: 'Arial', sans-serif;
 }
-.Homelink{
+
+.Homelink {
     margin-top: -40px;
     margin-left: 15px;
 }
-body{
+
+body {
     background-color: #0A0A0A;
 }
-#editProfileBtn{
+
+#editProfileBtn {
     background-color: #15292B;
-    border-color:ghostwhite;
+    border-color: ghostwhite;
 }
-#editProfileBtn:hover{
+
+#editProfileBtn:hover {
     background-color: #15292B;
-    border-color:blue;
+    border-color: blue;
 }
-#seereviewsBTN{
+
+#seereviewsBTN {
     background-color: #15292B;
-    border-color:ghostwhite;
+    border-color: ghostwhite;
 }
-#seereviewsBTN:hover{
+
+#seereviewsBTN:hover {
     background-color: #15292B;
-    border-color:blue;
+    border-color: blue;
 }
