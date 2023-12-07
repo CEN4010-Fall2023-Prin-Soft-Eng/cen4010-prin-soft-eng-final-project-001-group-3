@@ -78,8 +78,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             reviewDiv.appendChild(saveButton);
         }
 
-        reviewDiv.appendChild(document.createElement('hr'));
-
         gameDiv.appendChild(reviewDiv);
 
         reviewsContainer.appendChild(gameDiv);
@@ -119,3 +117,33 @@ async function saveEditedReview(index, gameId, token) {
     }
     location.reload();
 }
+
+async function getProfilePicture(token) {
+    const response = await fetch('/profile-data', {
+        method: 'GET',
+        headers: {
+            'Authorization': token
+        }
+    });
+
+    const data = await response.json();
+
+    return data.profilePicture;
+}
+
+async function updateAccountSection() {
+    if (token !== null) {
+        const loggedInAccount = document.getElementById('loggedInAccount');
+        const profilePicture = await getProfilePicture(token);
+
+        document.getElementById('profilePicture').src = profilePicture;
+
+        loggedInAccount.hidden = false;
+    } else {
+        const loggedOutAccount = document.getElementById('loggedOutAccount');
+
+        loggedOutAccount.hidden = false;
+    }
+}
+
+updateAccountSection();
