@@ -1,67 +1,16 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #0A0A0A;
-    color: ghostwhite;
+.website-logo {
+    width: 40px;
+    height: 40px;
 }
 
-header h1 a {
-    color: #007bff;
-    text-decoration: none;
-    transition: color 0.3s ease;
+.profile-picture {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
 }
 
-header h1 a:hover {
-    color: #0056b3;
-}
-
-.container {
-    background-color: #121212;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.list-group-item {
-    transition: background-color 0.3s ease;
-    background-color: #0A0A0A;
-}
-
-.list-group-item:hover {
-    background-color: #15292B;
-}
-
-.review-title {
-    color: #007bff;
-}
-
-.positive-icon,
-.negative-icon {
-    position: absolute;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    color: ghostwhite;
-    font-size: 26px;
-}
-
-.positive-icon {
-    top: 5px;
-    right: 70px;
-}
-
-.negative-icon {
-    top: 5px;
-    right: 2px;
-}
-
-.Homelink a:hover {
-    opacity: 100%;
-    text-decoration: none;
-
-}
-
-.Homelink a {
-    opacity: 80%;
-    color: ghostwhite;
-    font-size: 32px;
+.review-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
 }
