@@ -90,11 +90,7 @@ function displayGamesData(results) {
     for (const data of results) {
         const card = DEFAULT_CARD.cloneNode(true);
 
-        const image_node = card.querySelector('.card-img-top');
-
-        image_node.src = data.background_image;
-        image_node.alt = data.name;
-
+        card.querySelector('.card-img-top').src = data.background_image;
         card.querySelector('a').href = `/game.html?id=${data.id}`;
         card.querySelector('.card-title').textContent = data.name;
         card.querySelector('.positive-icon').addEventListener('click', () => openReviewModal(data.id, data.name, true));
